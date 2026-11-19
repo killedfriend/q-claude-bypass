@@ -19,6 +19,11 @@ model names, authentication and unsupported blocks, so Claude Code always sees
 
 Model IDs are examples and change over time.
 
+> **Verification status.** DeepSeek was live-tested on 2026-11-19. Tencent,
+> Alibaba and OpenRouter presets are based on the providers' official
+> documentation and were not live-tested in this repository. Check the model
+> IDs, endpoint and auth header for your account.
+
 ## DeepSeek
 
 Create a key at <https://platform.deepseek.com/api_keys>.

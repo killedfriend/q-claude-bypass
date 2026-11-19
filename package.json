@@ -1,6 +1,6 @@
 {
   "name": "qclaude-code",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Local Anthropic-compatible gateway and Windows installer for running Claude Code with third-party providers",
   "license": "MIT",

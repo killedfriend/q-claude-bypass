@@ -28,7 +28,8 @@ function Remove-EnvKeys([string]$Path) {
             'ANTHROPIC_BASE_URL', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_API_KEY',
             'ANTHROPIC_MODEL', 'ANTHROPIC_DEFAULT_OPUS_MODEL',
             'ANTHROPIC_DEFAULT_SONNET_MODEL', 'ANTHROPIC_DEFAULT_HAIKU_MODEL',
-            'CLAUDE_CODE_SUBAGENT_MODEL', 'CLAUDE_GATEWAY_ALLOW_LOOPBACK'
+            'CLAUDE_CODE_SUBAGENT_MODEL', 'CLAUDE_CODE_EFFORT_LEVEL',
+            'CLAUDE_CODE_AUTO_COMPACT_WINDOW', 'CLAUDE_GATEWAY_ALLOW_LOOPBACK'
         )
         foreach ($k in $ours) {
             if ($obj.env.PSObject.Properties[$k]) {

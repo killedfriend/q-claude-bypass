@@ -66,6 +66,11 @@ DeepSeek / 腾讯 / 阿里云 / OpenRouter
 阿里云 Coding Plan 等计费端点和完整说明见
 [`docs/zh/providers.md`](docs/zh/providers.md)。
 
+> **验证状态。** DeepSeek 路径已在 2026-11-19 用真实请求验证（普通请求、
+> 流式、工具、PDF、费用记录）。腾讯、阿里云和 OpenRouter 预设基于服务商官方
+> 文档编写，未在本仓库中做真实请求验证。使用前请核对账户支持的模型 ID 和
+> 认证头。
+
 ## 快速开始（Windows）
 
 要求：Windows 10/11、PowerShell 5.1+、可访问互联网。安装器会自动安装

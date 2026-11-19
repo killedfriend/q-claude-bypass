@@ -31,7 +31,7 @@ param(
 
     [string]$Repo = 'killedfriend/q-claude-bypass',
 
-    [string]$Version = '1.0.0',
+    [string]$Version = '1.0.1',
 
     [switch]$SkipNode,
     [switch]$SkipClaudeCode,
@@ -420,6 +420,8 @@ function Configure-ClaudeClient {
         'ANTHROPIC_DEFAULT_SONNET_MODEL'    = 'claude-sonnet-4-5[1m]'
         'ANTHROPIC_DEFAULT_HAIKU_MODEL'     = 'claude-haiku-4-5'
         'CLAUDE_CODE_SUBAGENT_MODEL'        = 'claude-sonnet-4-5'
+        'CLAUDE_CODE_EFFORT_LEVEL'          = 'max'
+        'CLAUDE_CODE_AUTO_COMPACT_WINDOW'   = '200000'
         'CLAUDE_GATEWAY_ALLOW_LOOPBACK'     = 'true'
     }
 

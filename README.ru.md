@@ -72,6 +72,12 @@ DeepSeek / Tencent / Alibaba / OpenRouter
 эндпоинты (Tencent TokenHub, Alibaba Coding Plan) — в
 [`docs/ru/providers.md`](docs/ru/providers.md).
 
+> **Статус проверки.** Путь DeepSeek проверен живыми запросами 2026-11-19
+> (запрос, стриминг, инструменты, PDF, учёт цены). Пресеты Tencent, Alibaba и
+> OpenRouter собраны по официальной документации провайдеров и в этом
+> репозитории живьём не проверялись. Сверьте ID моделей и заголовок
+> аутентификации для своего аккаунта, прежде чем полагаться на них.
+
 ## Быстрый старт (Windows)
 
 Требования: Windows 10/11, PowerShell 5.1+, интернет. Node.js 22+, Claude Code,

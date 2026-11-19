@@ -3,6 +3,16 @@
 All notable changes are documented here. The project is educational and
 non-commercial; compatibility is best-effort.
 
+## 1.0.1 — 2026-11-19
+
+- `install.cmd` can now bootstrap the latest installer when it is downloaded
+  alone, not only when it sits next to `install.ps1`.
+- The installer writes `CLAUDE_CODE_EFFORT_LEVEL` and
+  `CLAUDE_CODE_AUTO_COMPACT_WINDOW` into Claude settings; the uninstaller
+  removes them.
+- Documented which provider presets were live-tested and which are based on
+  official provider documentation.
+
 ## 1.0.0 — 2026-11-19
 
 First public release.

@@ -17,6 +17,10 @@
 
 模型 ID 只是示例，会随时间变化。
 
+> **验证状态。** DeepSeek 已在 2026-11-19 用真实请求验证。腾讯、阿里云和
+> OpenRouter 预设基于官方文档编写，未在本仓库中做真实请求验证。请核对账户
+> 支持的模型 ID、端点和认证头。
+
 ## DeepSeek
 
 创建密钥：<https://platform.deepseek.com/api_keys>。

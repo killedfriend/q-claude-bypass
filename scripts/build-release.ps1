@@ -59,9 +59,9 @@ foreach ($dir in @('gateway', 'desktop', 'docs', 'examples')) {
 # Point the release installer at this repository and this version.
 $sourceLines = Get-Content (Join-Path $root 'install.ps1')
 $installerLines = foreach ($line in $sourceLines) {
-    if ($line -like '*[string]$Repo = *') {
+    if ($line.Contains('[string]$Repo = ')) {
         '    [string]$Repo = ''' + $Repo + ''','
-    } elseif ($line -like '*[string]$Version = *') {
+    } elseif ($line.Contains('[string]$Version = ')) {
         '    [string]$Version = ''' + $Version + ''','
     } else {
         $line
