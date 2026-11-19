@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "provider": "deepseek",
+
+  "listen": { "host": "127.0.0.1", "port": 8788 },
+  "logFile": "logs/requests.jsonl",
+
+  "publicModels": [
+    "claude-sonnet-4-5[1m]",
+    "claude-opus-4-5",
+    "claude-haiku-4-5"
+  ],
+
+  "routing": {
+    "opusToHeavy": true,
+    "haikuToCheap": true,
+    "cheapWithoutTools": true
+  },
+
+  "context": {
+    "_comment": "Elide the text of old tool results so long sessions stop resending hundreds of thousands of tokens. Messages and tool_use/tool_result pairs are never dropped.",
+    "enabled": true,
+    "maxChars": 500000,
+    "keepRecentToolResults": 8,
+    "elideAboveChars": 4000
+  },
+
+  "limits": {
+    "dailyBudget": 0,
+    "maxRetries": 2,
+    "timeoutMs": 600000
+  }
+}

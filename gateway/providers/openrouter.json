@@ -1,0 +1,60 @@
+{
+  "name": "OpenRouter",
+  "docs": "https://openrouter.ai/docs/api/api-reference/anthropic-messages/create-a-message",
+  "upstream": "https://openrouter.ai/api",
+  "currency": "USD",
+
+  "auth": {
+    "mode": "gateway",
+    "header": "authorization",
+    "scheme": "Bearer ",
+    "env": "OPENROUTER_API_KEY"
+  },
+
+  "headers": {
+    "HTTP-Referer": "https://github.com/killedfriend/qclaude-code",
+    "X-Title": "QClaude Code"
+  },
+
+  "models": {
+    "main": "anthropic/claude-sonnet-4.5",
+    "heavy": "anthropic/claude-opus-4.5",
+    "cheap": "anthropic/claude-haiku-4.5"
+  },
+
+  "vision": [
+    "anthropic/claude-sonnet-4.5",
+    "anthropic/claude-opus-4.5",
+    "anthropic/claude-haiku-4.5"
+  ],
+  "documents": "native",
+  "cacheControl": "keep",
+
+  "cheapProfile": {
+    "maxTokens": 4096
+  },
+
+  "pricing": {
+    "_comment": "USD per 1M tokens, OpenRouter list prices. The gateway prefers the exact usage.cost returned by OpenRouter when present.",
+    "anthropic/claude-sonnet-4.5": { "input": 3, "cacheRead": 0.3, "output": 15 },
+    "anthropic/claude-opus-4.5": { "input": 5, "cacheRead": 0.5, "output": 25 },
+    "anthropic/claude-haiku-4.5": { "input": 1, "cacheRead": 0.1, "output": 5 }
+  },
+
+  "client": {
+    "direct": {
+      "model": "anthropic/claude-sonnet-4.5",
+      "opus": "anthropic/claude-opus-4.5",
+      "sonnet": "anthropic/claude-sonnet-4.5",
+      "haiku": "anthropic/claude-haiku-4.5",
+      "subagent": "anthropic/claude-sonnet-4.5"
+    },
+    "gateway": {
+      "model": "claude-sonnet-4-5[1m]",
+      "opus": "claude-opus-4-5",
+      "sonnet": "claude-sonnet-4-5[1m]",
+      "haiku": "claude-haiku-4-5",
+      "subagent": "claude-sonnet-4-5"
+    }
+  }
+}

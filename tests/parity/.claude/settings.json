@@ -1,0 +1,20 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["audit"],
+  "permissions": {
+    "allow": ["mcp__audit__echo"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \".\\hook.ps1\""
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.hunyuan.cloud.tencent.com/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "REPLACE_WITH_YOUR_TENCENT_API_KEY",
+    "ANTHROPIC_API_KEY": "",
+    "ANTHROPIC_MODEL": "hunyuan-2.0-instruct-20251111",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "hunyuan-2.0-thinking-20251109",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "hunyuan-2.0-instruct-20251111",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "hunyuan-2.0-instruct-20251111",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "hunyuan-2.0-instruct-20251111"
+  }
+}

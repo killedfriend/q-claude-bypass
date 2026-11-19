@@ -1,0 +1,47 @@
+{
+  "name": "Tencent Hunyuan",
+  "docs": "https://cloud.tencent.com/document/product/1729/127293",
+  "upstream": "https://api.hunyuan.cloud.tencent.com/anthropic",
+  "currency": "CNY",
+
+  "auth": {
+    "mode": "gateway",
+    "header": "x-api-key",
+    "scheme": "",
+    "env": "TENCENT_API_KEY"
+  },
+
+  "models": {
+    "main": "hunyuan-2.0-instruct-20251111",
+    "heavy": "hunyuan-2.0-thinking-20251109",
+    "cheap": "hunyuan-2.0-instruct-20251111"
+  },
+
+  "vision": [],
+  "documents": "none",
+
+  "cheapProfile": {
+    "maxTokens": 4096
+  },
+
+  "pricing": {
+    "_comment": "Optional. Fill in CNY per 1M tokens from the Tencent Cloud console to enable cost accounting."
+  },
+
+  "client": {
+    "direct": {
+      "model": "hunyuan-2.0-instruct-20251111",
+      "opus": "hunyuan-2.0-thinking-20251109",
+      "sonnet": "hunyuan-2.0-instruct-20251111",
+      "haiku": "hunyuan-2.0-instruct-20251111",
+      "subagent": "hunyuan-2.0-instruct-20251111"
+    },
+    "gateway": {
+      "model": "claude-sonnet-4-5[1m]",
+      "opus": "claude-opus-4-5",
+      "sonnet": "claude-sonnet-4-5[1m]",
+      "haiku": "claude-haiku-4-5",
+      "subagent": "claude-sonnet-4-5"
+    }
+  }
+}

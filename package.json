@@ -1,0 +1,15 @@
+{
+  "name": "qclaude-code",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local Anthropic-compatible gateway and Windows installer for running Claude Code with third-party providers",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test gateway/test/config.test.mjs gateway/test/routing.test.mjs gateway/test/pricing.test.mjs gateway/test/context.test.mjs gateway/test/server.test.mjs",
+    "check": "node --check gateway/server.mjs && node --check gateway/report.mjs"
+  }
+}

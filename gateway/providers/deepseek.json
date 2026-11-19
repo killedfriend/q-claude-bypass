@@ -1,0 +1,71 @@
+{
+  "name": "DeepSeek",
+  "docs": "https://api-docs.deepseek.com/",
+  "upstream": "https://api.deepseek.com/anthropic",
+  "currency": "CNY",
+
+  "auth": {
+    "mode": "gateway",
+    "header": "authorization",
+    "scheme": "Bearer ",
+    "env": "DEEPSEEK_API_KEY"
+  },
+
+  "models": {
+    "main": "deepseek-flash[1m]",
+    "heavy": "deepseek-v4-pro",
+    "cheap": "deepseek-flash"
+  },
+
+  "vision": ["deepseek-flash"],
+  "documents": "deepseek-files",
+
+  "cheapProfile": {
+    "effort": "low",
+    "thinking": "disabled",
+    "maxTokens": 4096
+  },
+
+  "pricing": {
+    "_comment": "CNY per 1M tokens. Peak = Mon-Fri 09:00-12:00 and 14:00-18:00 Beijing; off-peak is half price. CN holidays are not modelled.",
+    "deepseek-flash": {
+      "peak": { "cacheRead": 0.04, "input": 2, "output": 8 },
+      "offPeak": { "cacheRead": 0.02, "input": 1, "output": 4 }
+    },
+    "deepseek-v4-pro": {
+      "peak": { "cacheRead": 0.30, "input": 9, "output": 27 },
+      "offPeak": { "cacheRead": 0.15, "input": 4.5, "output": 13.5 }
+    }
+  },
+
+  "files": {
+    "uploadUrl": "https://api.deepseek.com/files",
+    "documentPurpose": "rich_layout_recognition",
+    "cacheFile": "logs/files.json",
+    "timeoutMs": 120000
+  },
+
+  "webPricing": {
+    "_comment": "CNY per 1000 calls. Server-side web search/fetch is billed separately from tokens.",
+    "search": 5,
+    "fetch": 5,
+    "unit": 1000
+  },
+
+  "client": {
+    "direct": {
+      "model": "claude-sonnet-4-5[1m]",
+      "opus": "claude-opus-4-5",
+      "sonnet": "claude-sonnet-4-5[1m]",
+      "haiku": "claude-haiku-4-5",
+      "subagent": "claude-sonnet-4-5"
+    },
+    "gateway": {
+      "model": "claude-sonnet-4-5[1m]",
+      "opus": "claude-opus-4-5",
+      "sonnet": "claude-sonnet-4-5[1m]",
+      "haiku": "claude-haiku-4-5",
+      "subagent": "claude-sonnet-4-5"
+    }
+  }
+}

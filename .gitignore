@@ -1,0 +1,32 @@
+# secrets and local state
+.env
+.env.*
+secrets.*
+*.key
+*.pfx
+gateway/logs/
+gateway/providers/*.local.json
+install.json
+
+# generated test/parity output
+tests/parity/hook-input.jsonl
+tests/parity/hook-fired.txt
+tests/parity/note*.txt
+tests/parity/hello.txt.bak
+desktop/mitm/setup.log
+
+# build output
+dist/
+stage/
+*.zip
+*.sha256
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# node
+node_modules/
+npm-debug.log*

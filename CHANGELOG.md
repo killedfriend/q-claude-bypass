@@ -1,0 +1,25 @@
+# Changelog
+
+All notable changes are documented here. The project is educational and
+non-commercial; compatibility is best-effort.
+
+## 1.0.0 — 2026-11-19
+
+First public release.
+
+- Generalized the DeepSeek-only gateway into provider presets:
+  DeepSeek, Tencent Hunyuan, Alibaba Cloud Bailian (Qwen), OpenRouter.
+- Added configurable auth (`Authorization: Bearer` or `x-api-key`), static
+  upstream headers, model maps, currencies and pricing tables.
+- Added `haikuToCheap` routing and per-provider `cheapProfile`.
+- Added document modes: `deepseek-files`, `native`, `none`.
+- OpenRouter exact `usage.cost` is stored when present.
+- Added `GET /health` with provider, upstream, routes and key state.
+- Added process PID file and reliable `gateway/start.ps1 -Stop`.
+- Added a one-command Windows installer: Node.js, Claude Code, Claude Desktop,
+  gateway, logon autostart, smoke test.
+- Added an uninstaller.
+- Added trilingual documentation (Russian, English, Simplified Chinese).
+- Added direct-mode settings examples for all providers.
+- Added Node test suite (config, routing, pricing, context, HTTP integration).
+- Added CI and release workflows.

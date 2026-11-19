@@ -1,0 +1,57 @@
+name: Bug report
+description: Report a reproducible problem without secrets
+title: '[bug] '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste API keys, cookies, prompts, customer data or personal paths.**
+        This is an educational, non-commercial project with best-effort support.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Release version or commit.
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Provider
+      options:
+        - DeepSeek
+        - Tencent Hunyuan
+        - Alibaba Bailian
+        - OpenRouter
+        - Custom
+        - Not provider-specific
+    validations:
+      required: true
+  - type: input
+    id: models
+    attributes:
+      label: Model IDs and endpoint
+      description: Public model IDs only.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction
+      description: Exact commands, minimal request, expected vs actual.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      description: Last lines of requests.jsonl or err.log with keys and prompts removed.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I ran `Invoke-RestMethod http://127.0.0.1:8788/health`
+          required: true
+        - label: I removed all secrets and personal data from this report
+          required: true

@@ -1,0 +1,47 @@
+{
+  "name": "Alibaba Cloud Bailian (Qwen)",
+  "docs": "https://help.aliyun.com/zh/model-studio/claude-code",
+  "upstream": "https://dashscope.aliyuncs.com/apps/anthropic",
+  "currency": "CNY",
+
+  "auth": {
+    "mode": "gateway",
+    "header": "authorization",
+    "scheme": "Bearer ",
+    "env": "DASHSCOPE_API_KEY"
+  },
+
+  "models": {
+    "main": "qwen3.7-plus",
+    "heavy": "qwen3.7-max",
+    "cheap": "qwen3.6-flash"
+  },
+
+  "vision": [],
+  "documents": "none",
+
+  "cheapProfile": {
+    "maxTokens": 4096
+  },
+
+  "pricing": {
+    "_comment": "Optional. Fill in CNY per 1M tokens from the Alibaba Cloud Model Studio console to enable cost accounting."
+  },
+
+  "client": {
+    "direct": {
+      "model": "qwen3.7-plus",
+      "opus": "qwen3.7-max",
+      "sonnet": "qwen3.7-plus",
+      "haiku": "qwen3.6-flash",
+      "subagent": "qwen3.7-plus"
+    },
+    "gateway": {
+      "model": "claude-sonnet-4-5[1m]",
+      "opus": "claude-opus-4-5",
+      "sonnet": "claude-sonnet-4-5[1m]",
+      "haiku": "claude-haiku-4-5",
+      "subagent": "claude-sonnet-4-5"
+    }
+  }
+}
