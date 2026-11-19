@@ -78,7 +78,8 @@ page. Alternative billing endpoints (Tencent TokenHub, Alibaba Coding Plan) and
 full details are in [`docs/en/providers.md`](docs/en/providers.md).
 
 > **Verification status.** The DeepSeek path was live-tested on 2026-11-19
-> (request, streaming, tools, PDF, cost log). The Tencent, Alibaba and
+> (request, streaming, tools, PDF, cost log) with Claude Code 2.1.326 and
+> Claude Desktop 5.11492.5 on Windows 11, Node 22.20. The Tencent, Alibaba and
 > OpenRouter presets are based on the providers' official documentation and
 > were not live-tested in this repository. Verify the model IDs and auth header
 > for your account before relying on them.
