@@ -3,6 +3,11 @@
 All notable changes are documented here. The project is educational and
 non-commercial; compatibility is best-effort.
 
+## 1.0.4 — 2026-11-19
+
+- The MITM HTTPS check runs only after the certificate and hosts setup actually
+  succeeded, so a cancelled UAC no longer produces a misleading TLS warning.
+
 ## 1.0.3 — 2026-11-19
 
 - Claude Desktop MITM is now installed automatically by default:

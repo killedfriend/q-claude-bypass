@@ -36,7 +36,7 @@ param(
 
     [string]$Repo = 'killedfriend/q-claude-bypass',
 
-    [string]$Version = '1.0.3',
+    [string]$Version = '1.0.4',
 
     [switch]$SkipNode,
     [switch]$SkipClaudeCode,
@@ -568,7 +568,7 @@ function Install-Mitm {
 }
 
 function Test-Mitm {
-    if ($NoMitm -or $SkipClaudeDesktop -or $NoStart) { return }
+    if (-not $script:MitmOk -or $NoMitm -or $SkipClaudeDesktop -or $NoStart) { return }
     Write-Step 'MITM check'
     try {
         $r = Invoke-WebRequest 'https://api.anthropic.com/health' -UseBasicParsing -TimeoutSec 8
