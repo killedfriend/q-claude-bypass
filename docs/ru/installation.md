@@ -81,6 +81,7 @@ PowerShell или в списке процессов. Лучше использ�
 | Расположение | Изменение |
 |---|---|
 | `%LOCALAPPDATA%\QClaudeCode` | Шлюз, лаунчеры, документация, примеры |
+| `%LOCALAPPDATA%\QClaudeCode\bin` | Обёртки `qclaude` и `qclaude-gw`, добавляются в пользовательский PATH |
 | `%LOCALAPPDATA%\QClaudeCode\tools\node` | Переносимый Node.js, только если Node.js не было и winget не сработал |
 | `%USERPROFILE%\.claude\settings.json` | Добавляет переменные шлюза `ANTHROPIC_*`, остальные настройки сохраняются |
 | `%USERPROFILE%\.claude.json` | Устанавливает `hasCompletedOnboarding: true` |

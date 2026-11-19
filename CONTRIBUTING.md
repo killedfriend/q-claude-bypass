@@ -51,7 +51,7 @@ Get-ChildItem -Recurse -Filter *.json | ForEach-Object {
 Build a release locally:
 
 ```powershell
-.\scripts\build-release.ps1 -Version 1.0.0 -Repo killedfriend/q-claude-bypass
+.\scripts\build-release.ps1 -Version 1.0.2 -Repo killedfriend/q-claude-bypass
 ```
 
 ## Style

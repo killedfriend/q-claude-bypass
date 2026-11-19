@@ -3,6 +3,16 @@
 All notable changes are documented here. The project is educational and
 non-commercial; compatibility is best-effort.
 
+## 1.0.2 — 2026-11-19
+
+- The installer now creates `qclaude.cmd` and `qclaude-gw.cmd` in
+  `%LOCALAPPDATA%\QClaudeCode\bin` and adds that directory to the user PATH.
+  `qclaude-gw` works in a new terminal.
+- The uninstaller removes those PATH entries.
+- Installer native calls (npm, winget) no longer abort on harmless stderr
+  output under PowerShell 5.1 `$ErrorActionPreference = 'Stop'`.
+- The parity harness no longer deletes its own README.
+
 ## 1.0.1 — 2026-11-19
 
 - `install.cmd` can now bootstrap the latest installer when it is downloaded

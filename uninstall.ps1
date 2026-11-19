@@ -19,6 +19,18 @@ param(
 
 $ErrorActionPreference = 'Continue'
 
+function Remove-UserPath([string]$dir) {
+    if (-not $dir) { return }
+    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+    if (-not $userPath) { return }
+    $parts = @($userPath -split ';' | Where-Object { $_ -and $_ -ne $dir })
+    $newPath = ($parts -join ';')
+    if ($newPath -ne $userPath) {
+        [Environment]::SetEnvironmentVariable('Path', $newPath, 'User')
+        Write-Host "removed from user PATH: $dir"
+    }
+}
+
 function Remove-EnvKeys([string]$Path) {
     if (-not (Test-Path $Path)) { return }
     try {
@@ -54,12 +66,18 @@ if (Test-Path $runKey) {
 }
 
 # 2. Stop gateway
+$candidates = @()
 $pidFile = Join-Path $InstallDir 'gateway\logs\gateway.pid'
 if (Test-Path $pidFile) {
     $saved = Get-Content $pidFile -Raw -ErrorAction SilentlyContinue
-    if ($saved -and $saved.Trim() -match '^\d+$') {
-        Stop-Process -Id ([int]$saved.Trim()) -Force -ErrorAction SilentlyContinue
-        Write-Host 'stopped gateway'
+    if ($saved -and $saved.Trim() -match '^\d+$') { $candidates += [int]$saved.Trim() }
+}
+$conn = Get-NetTCPConnection -LocalPort 8788 -State Listen -ErrorAction SilentlyContinue
+if ($conn) { $candidates += ($conn | Select-Object -ExpandProperty OwningProcess -Unique) }
+foreach ($gatewayPid in ($candidates | Select-Object -Unique)) {
+    if (Get-Process -Id $gatewayPid -ErrorAction SilentlyContinue) {
+        Stop-Process -Id $gatewayPid -Force -ErrorAction SilentlyContinue
+        Write-Host "stopped gateway pid $gatewayPid"
     }
 }
 
@@ -90,17 +108,26 @@ if ($RemoveApiKey) {
 if ($RemoveClaudeCode) {
     $npm = Get-Command npm.cmd -ErrorAction SilentlyContinue
     if ($npm) {
+        $previous = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
         & $npm.Source uninstall -g '@anthropic-ai/claude-code' 2>&1 | Out-Host
+        $ErrorActionPreference = $previous
     }
 }
 if ($RemoveClaudeDesktop) {
     $winget = Get-Command winget -ErrorAction SilentlyContinue
     if ($winget) {
+        $previous = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
         & winget uninstall --id Anthropic.Claude -e --silent 2>&1 | Out-Host
+        $ErrorActionPreference = $previous
     }
 }
 
-# 6. Install directory
+# 6. Install directory and PATH entries
+Remove-UserPath (Join-Path $InstallDir 'bin')
+Remove-UserPath (Join-Path $InstallDir 'npm')
+Remove-UserPath (Join-Path $InstallDir 'tools\node')
 if (Test-Path $InstallDir) {
     Remove-Item $InstallDir -Recurse -Force -ErrorAction SilentlyContinue
     Write-Host "removed $InstallDir"

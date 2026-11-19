@@ -78,6 +78,7 @@ irm https://github.com/killedfriend/q-claude-bypass/releases/latest/download/ins
 | 位置 | 修改 |
 |---|---|
 | `%LOCALAPPDATA%\QClaudeCode` | 网关、启动器、文档、示例 |
+| `%LOCALAPPDATA%\QClaudeCode\bin` | `qclaude`、`qclaude-gw` 包装脚本，已加入用户 PATH |
 | `%LOCALAPPDATA%\QClaudeCode\tools\node` | 便携版 Node.js，仅在系统没有 Node.js 且 winget 失败时 |
 | `%USERPROFILE%\.claude\settings.json` | 添加网关的 `ANTHROPIC_*` 变量，保留其他设置 |
 | `%USERPROFILE%\.claude.json` | 设置 `hasCompletedOnboarding: true` |

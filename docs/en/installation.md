@@ -82,6 +82,7 @@ Run the script from a downloaded file to pass parameters:
 | Location | Change |
 |---|---|
 | `%LOCALAPPDATA%\QClaudeCode` | Gateway, launchers, docs, examples |
+| `%LOCALAPPDATA%\QClaudeCode\bin` | `qclaude` and `qclaude-gw` wrappers, added to user PATH |
 | `%LOCALAPPDATA%\QClaudeCode\tools\node` | Portable Node.js, only if Node.js was missing and winget failed |
 | `%USERPROFILE%\.claude\settings.json` | Adds gateway `ANTHROPIC_*` variables, keeps other settings |
 | `%USERPROFILE%\.claude.json` | Sets `hasCompletedOnboarding: true` |

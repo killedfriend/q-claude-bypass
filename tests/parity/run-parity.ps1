@@ -10,7 +10,7 @@ $q = Join-Path $repo 'qclaude-gw.ps1'
 if (-not (Test-Path $q)) { throw "launcher not found: $q" }
 
 Set-Location $root
-Remove-Item hook-fired.txt, hook-input.jsonl, note.txt, note2.txt, README.md -ErrorAction SilentlyContinue
+Remove-Item hook-fired.txt, hook-input.jsonl, note.txt, note2.txt -ErrorAction SilentlyContinue
 Set-Content -Path hello.txt -Value 'alpha beta gamma' -Encoding ASCII
 
 function Invoke-Claude {

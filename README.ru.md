@@ -1,5 +1,9 @@
 # QClaude Code
 
+[![Release](https://img.shields.io/github/v/release/killedfriend/q-claude-bypass?label=release)](https://github.com/killedfriend/q-claude-bypass/releases)
+[![CI](https://github.com/killedfriend/q-claude-bypass/actions/workflows/ci.yml/badge.svg)](https://github.com/killedfriend/q-claude-bypass/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 [English](README.en.md) · [中文](README.zh-CN.md) · **Русский**
 
 > **Учебный некоммерческий проект.** Этот репозиторий создан исключительно для

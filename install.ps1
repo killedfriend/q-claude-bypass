@@ -31,7 +31,7 @@ param(
 
     [string]$Repo = 'killedfriend/q-claude-bypass',
 
-    [string]$Version = '1.0.1',
+    [string]$Version = '1.0.2',
 
     [switch]$SkipNode,
     [switch]$SkipClaudeCode,
@@ -154,7 +154,10 @@ function Ensure-Node {
     $winget = Get-Command winget -ErrorAction SilentlyContinue
     if ($winget) {
         Write-Host '    installing Node.js LTS with winget...'
+        $previous = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
         & winget install --id OpenJS.NodeJS.LTS -e --silent --accept-package-agreements --accept-source-agreements 2>&1 | Out-Host
+        $ErrorActionPreference = $previous
         Refresh-Path
         if ((Get-NodeMajor) -ge 22) {
             Write-Ok "installed $(& node --version)"
@@ -207,15 +210,22 @@ function Ensure-ClaudeCode {
     if (-not $npmPath) { throw 'npm.cmd not found; install Node.js 22+ and rerun' }
 
     Write-Host '    npm install -g @anthropic-ai/claude-code@latest'
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     & $npmPath install -g '@anthropic-ai/claude-code@latest' 2>&1 | Out-Host
     $code = $LASTEXITCODE
+    $ErrorActionPreference = $previous
 
     if ($code -ne 0) {
         Write-Warn 'global npm install failed, retrying into the user install directory'
         $prefix = Join-Path $InstallDir 'npm'
         New-Item -ItemType Directory -Force $prefix | Out-Null
+        $previous = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
         & $npmPath install -g --prefix $prefix '@anthropic-ai/claude-code@latest' 2>&1 | Out-Host
-        if ($LASTEXITCODE -ne 0) { throw 'Claude Code installation failed (npm exit code ' + $LASTEXITCODE + ')' }
+        $fallbackCode = $LASTEXITCODE
+        $ErrorActionPreference = $previous
+        if ($fallbackCode -ne 0) { throw "Claude Code installation failed (npm exit code $fallbackCode)" }
         Add-UserPath $prefix
     }
 
@@ -246,7 +256,10 @@ function Ensure-ClaudeDesktop {
 
     $installed = $false
     try {
+        $previous = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
         $list = (& winget list --id Anthropic.Claude -e --accept-source-agreements 2>$null | Out-String)
+        $ErrorActionPreference = $previous
         if ($list -match 'Anthropic\.Claude') { $installed = $true }
     } catch { }
 
@@ -255,8 +268,12 @@ function Ensure-ClaudeDesktop {
         return
     }
 
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     & winget install --id Anthropic.Claude -e --silent --accept-package-agreements --accept-source-agreements 2>&1 | Out-Host
-    if ($LASTEXITCODE -ne 0) {
+    $code = $LASTEXITCODE
+    $ErrorActionPreference = $previous
+    if ($code -ne 0) {
         Write-Warn 'winget could not install Claude Desktop. Use https://claude.ai/download'
     } else {
         Write-Ok 'installed'
@@ -318,7 +335,16 @@ function Copy-Runtime {
             Copy-Item $_.FullName $dst -Force
         }
     }
-    Write-Ok 'files copied'
+
+    # User-facing commands on PATH, so `qclaude-gw` works in a new terminal.
+    $bin = Join-Path $To 'bin'
+    New-Item -ItemType Directory -Force $bin | Out-Null
+    $gwCmd = "@echo off`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$To\qclaude-gw.ps1`" %*`r`n"
+    $directCmd = "@echo off`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$To\qclaude.ps1`" %*`r`n"
+    Write-Utf8NoBom (Join-Path $bin 'qclaude-gw.cmd') $gwCmd
+    Write-Utf8NoBom (Join-Path $bin 'qclaude.cmd') $directCmd
+    Add-UserPath $bin
+    Write-Ok 'files copied; qclaude-gw added to PATH'
 }
 
 function Select-Provider {
