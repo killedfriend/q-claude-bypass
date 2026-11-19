@@ -41,7 +41,9 @@ irm https://github.com/killedfriend/q-claude-bypass/releases/latest/download/ins
 ```
 
 The installer sets up Node.js 22+, Claude Code, Claude Desktop, the gateway,
-logon autostart, and verifies the selected provider key.
+automatic Claude Desktop MITM (UAC required), logon autostart, and verifies the
+selected provider key. Use `-NoMitm` on a downloaded `install.ps1` to skip the
+hosts/certificate changes.
 
 ## Providers
 

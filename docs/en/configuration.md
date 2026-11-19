@@ -317,6 +317,11 @@ if the gateway is not running. Request records go to
 `gateway\logs\requests.jsonl`; run `gateway\start.ps1` in a terminal to see
 startup errors. There is no admin requirement and no Windows service.
 
+If `desktop\mitm\api.anthropic.com.pfx` exists, `gateway\gw-env.ps1` sets
+`GATEWAY_TLS_PFX` automatically, and the gateway also listens on
+`https://127.0.0.1:443` for the Desktop MITM. Delete the PFX (or run
+`desktop\mitm\teardown-mitm.ps1`) and restart the gateway to disable it.
+
 To disable:
 
 ```powershell

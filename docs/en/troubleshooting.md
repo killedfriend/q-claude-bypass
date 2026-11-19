@@ -152,29 +152,55 @@ not `api.deepseek.com/anthropic`. The same applies to every provider.
 
 ## Claude Desktop
 
-Claude Desktop is the hardest part. It often ignores:
+The installer now configures Claude Desktop through a local MITM **by default**.
+It creates a local CA in Trusted Root, issues a certificate for
+`api.anthropic.com`, adds `127.0.0.1 api.anthropic.com` to `hosts`, and writes a
+PFX used by the gateway TLS listener on port 443. UAC approval is required.
 
-- process environment variables;
-- `C:\Program Files\ClaudeCode\managed-settings.json` (CLI path);
-- `HKLM\SOFTWARE\Policies\ClaudeCode` (logs `[managedConfig] type: 'none'`).
+If Desktop still cannot connect, check in this order:
 
-Options, from least to most invasive:
+```powershell
+# 1. hosts entry
+Select-String "$env:SystemRoot\System32\drivers\etc\hosts" -Pattern 'qclaude-mitm'
 
-1. **CC Switch** — third-party local router with a Desktop panel. It keeps its
+# 2. local CA is trusted
+Get-ChildItem Cert:\LocalMachine\Root | Where-Object Subject -eq 'CN=QClaude Local CA'
+
+# 3. PFX exists
+Test-Path "$env:LOCALAPPDATA\QClaudeCode\desktop\mitm\api.anthropic.com.pfx"
+
+# 4. gateway is running and TLS responds
+Invoke-RestMethod http://127.0.0.1:8788/health
+Invoke-WebRequest https://api.anthropic.com/health -UseBasicParsing
+
+# 5. port 443 is owned by the gateway, not another service
+Get-NetTCPConnection -LocalPort 443 -State Listen
+```
+
+Common causes:
+
+- UAC was cancelled during installation: rerun `install.ps1` and approve it, or
+  run `desktop\mitm\setup-mitm.ps1` as administrator.
+- The gateway was already running before MITM was installed: restart it with
+  `gateway\start.ps1 -Stop` and `gateway\start.ps1`.
+- Another process listens on 443: stop it or use `-NoMitm` and a different
+  Desktop approach.
+- Corporate VPN/proxy intercepts TLS: do not combine it with this MITM without
+  understanding the certificate chain.
+- `-NoMitm` was used: Desktop is not intercepted. Install it manually:
+  ```powershell
+  .\desktop\mitm\setup-mitm.ps1        # administrator
+  ```
+
+Alternatives if MITM is not acceptable:
+
+1. **CC Switch** - third-party local router with a Desktop panel. It keeps its
    own gateway on `127.0.0.1:15721`.
-2. **Experimental policy** — run the installer with `-ConfigureDesktop`, or:
+2. **Experimental policy** - run the installer with `-ConfigureDesktop`, or:
    ```powershell
    .\desktop\apply-desktop-policy.ps1   # administrator
    ```
    Restart Desktop and check whether it respects the settings.
-3. **MITM** — the most reliable:
-   ```powershell
-   .\desktop\mitm\setup-mitm.ps1        # administrator
-   ```
-   It creates a local CA, trusts it, issues a certificate for
-   `api.anthropic.com`, edits `hosts`, and writes a PFX for the gateway TLS
-   listener. Then start the gateway with `GATEWAY_TLS_PFX` set (the helper
-   `gateway\gw-env.ps1` finds the PFX automatically).
 
 Rollback:
 
@@ -183,8 +209,8 @@ Rollback:
 .\desktop\revert-all.ps1              # policy and managed settings
 ```
 
-Do not combine MITM with a VPN or corporate TLS inspection without
-understanding the certificate chain.
+`uninstall.ps1` runs the MITM teardown automatically and asks for UAC. If UAC is
+cancelled, it keeps the install directory so you can retry.
 
 ## Port 8788 already in use
 

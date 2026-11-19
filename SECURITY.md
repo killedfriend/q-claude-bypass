@@ -44,6 +44,23 @@ additional authentication, and do not enable dumps on sensitive data.
 - The MITM helper creates a local CA and a certificate private key. Treat the
   PFX as a secret and remove it with `desktop/mitm/teardown-mitm.ps1`.
 
+## Automatic MITM
+
+The Windows installer enables a local MITM for Claude Desktop by default:
+
+- it creates and trusts `CN=QClaude Local CA` in the machine Trusted Root store;
+- it issues a certificate for `api.anthropic.com`;
+- it changes the machine `hosts` file to `127.0.0.1 api.anthropic.com`;
+- it stores a PFX with a known local passphrase in the install directory;
+- the gateway listens on `127.0.0.1:443` while it is running.
+
+This is a machine-wide interception of `api.anthropic.com`. If the gateway is
+stopped, applications that rely on that host cannot connect. Use `-NoMitm` to
+skip it. Uninstall removes the hosts entry, certificates and PFX; if UAC is
+cancelled, the install directory is kept so cleanup can be retried. Do not
+combine this with a corporate TLS-inspection proxy or VPN without understanding
+the certificate chain.
+
 ## Supported versions
 
 Only the latest release is supported with security fixes. This is a

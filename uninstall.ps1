@@ -5,7 +5,9 @@
 
 .DESCRIPTION
   Claude Code and Claude Desktop are left installed unless you pass the
-  corresponding switch. API keys are left in user environment unless -RemoveApiKey.
+  corresponding switch. API keys are left in user environment unless
+  -RemoveApiKey. The Claude Desktop MITM (hosts entry, local CA, certificate)
+  is removed automatically; use -NoMitmCleanup to keep it.
 #>
 [CmdletBinding()]
 param(
@@ -14,10 +16,23 @@ param(
     [switch]$RemoveApiKey,
     [switch]$RemoveClaudeCode,
     [switch]$RemoveClaudeDesktop,
-    [switch]$KeepSettings
+    [switch]$KeepSettings,
+    [switch]$NoMitmCleanup
 )
 
 $ErrorActionPreference = 'Continue'
+
+function Test-Admin {
+    $id = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $p = New-Object Security.Principal.WindowsPrincipal($id)
+    return $p.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+function Invoke-ElevatedScript([string]$ScriptPath) {
+    $argLine = "-NoProfile -ExecutionPolicy Bypass -File `"$ScriptPath`""
+    $p = Start-Process -FilePath 'powershell.exe' -Verb RunAs -Wait -PassThru -ArgumentList $argLine
+    return $p.ExitCode
+}
 
 function Remove-UserPath([string]$dir) {
     if (-not $dir) { return }
@@ -81,7 +96,47 @@ foreach ($gatewayPid in ($candidates | Select-Object -Unique)) {
     }
 }
 
-# 3. Claude settings
+# 3. MITM (hosts entry, local CA, certificate, PFX)
+$mitmCleanupOk = $true
+if (-not $NoMitmCleanup) {
+    $mitmPfx = Join-Path $InstallDir 'desktop\mitm\api.anthropic.com.pfx'
+    $hosts = "$env:SystemRoot\System32\drivers\etc\hosts"
+    $hasHostsEntry = $false
+    try { $hasHostsEntry = [bool](Select-String -Path $hosts -Pattern 'qclaude-mitm' -Quiet) } catch { }
+    $hasMitm = $hasHostsEntry -or (Test-Path $mitmPfx)
+
+    if ($hasMitm) {
+        $helper = Join-Path $InstallDir 'desktop\mitm\teardown-mitm.ps1'
+        if (-not (Test-Path $helper)) {
+            Write-Host "MITM cleanup helper not found: $helper" -ForegroundColor Red
+            Write-Host 'hosts still points api.anthropic.com to 127.0.0.1; fix it manually.' -ForegroundColor Red
+            $mitmCleanupOk = $false
+        } else {
+            try {
+                if (Test-Admin) {
+                    & $helper
+                    $code = $LASTEXITCODE
+                } else {
+                    Write-Host 'administrator rights are required to remove the MITM certificate; accepting UAC...'
+                    $code = Invoke-ElevatedScript $helper
+                }
+                if ($code -ne 0) {
+                    Write-Host "MITM cleanup returned exit code $code" -ForegroundColor Red
+                    $mitmCleanupOk = $false
+                } else {
+                    Write-Host 'MITM certificate, hosts entry and PFX removed'
+                }
+            } catch {
+                Write-Host "MITM cleanup was not completed: $($_.Exception.Message)" -ForegroundColor Red
+                $mitmCleanupOk = $false
+            }
+        }
+    }
+} else {
+    Write-Host 'MITM cleanup skipped (-NoMitmCleanup)'
+}
+
+# 4. Claude settings
 if (-not $KeepSettings) {
     Remove-EnvKeys (Join-Path $ClaudeHome 'settings.json')
     $claudeJson = Join-Path (Split-Path $ClaudeHome -Parent) '.claude.json'
@@ -96,7 +151,7 @@ if (-not $KeepSettings) {
     }
 }
 
-# 4. API keys
+# 5. API keys
 if ($RemoveApiKey) {
     foreach ($name in @('DEEPSEEK_API_KEY', 'TENCENT_API_KEY', 'DASHSCOPE_API_KEY', 'OPENROUTER_API_KEY')) {
         [Environment]::SetEnvironmentVariable($name, $null, 'User')
@@ -104,7 +159,7 @@ if ($RemoveApiKey) {
     }
 }
 
-# 5. Optional apps
+# 6. Optional apps
 if ($RemoveClaudeCode) {
     $npm = Get-Command npm.cmd -ErrorAction SilentlyContinue
     if ($npm) {
@@ -124,13 +179,18 @@ if ($RemoveClaudeDesktop) {
     }
 }
 
-# 6. Install directory and PATH entries
+# 7. Install directory and PATH entries
 Remove-UserPath (Join-Path $InstallDir 'bin')
 Remove-UserPath (Join-Path $InstallDir 'npm')
 Remove-UserPath (Join-Path $InstallDir 'tools\node')
 if (Test-Path $InstallDir) {
-    Remove-Item $InstallDir -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "removed $InstallDir"
+    if ($mitmCleanupOk) {
+        Remove-Item $InstallDir -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "removed $InstallDir"
+    } else {
+        Write-Host "kept $InstallDir so MITM can be reverted" -ForegroundColor Yellow
+        Write-Host "run: powershell -ExecutionPolicy Bypass -File `"$InstallDir\desktop\mitm\teardown-mitm.ps1`"" -ForegroundColor Yellow
+    }
 }
 
 Write-Host 'done' -ForegroundColor Green

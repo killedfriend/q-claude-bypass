@@ -137,14 +137,44 @@ https://api.deepseek.com/anthropic
 
 ## Claude Desktop
 
-Claude Desktop 是最难的部分。它经常忽略：
+安装器现在**默认**通过本地 MITM 配置 Claude Desktop：在受信任根中加入 CA、为
+`api.anthropic.com` 签发证书、把 `127.0.0.1 api.anthropic.com` 写入 `hosts`，
+并生成网关 443 端口 TLS 监听使用的 PFX。需要 UAC 确认。
 
-- 进程环境变量；
-- `C:\Program Files\ClaudeCode\managed-settings.json`（CLI 路径）；
-- `HKLM\SOFTWARE\Policies\ClaudeCode`（日志显示
-  `[managedConfig] type: 'none'`）。
+如果 Desktop 仍无法连接，按顺序检查：
 
-从温和到激进：
+```powershell
+# 1. hosts 记录
+Select-String "$env:SystemRoot\System32\drivers\etc\hosts" -Pattern 'qclaude-mitm'
+
+# 2. CA 已受信任
+Get-ChildItem Cert:\LocalMachine\Root | Where-Object Subject -eq 'CN=QClaude Local CA'
+
+# 3. PFX 存在
+Test-Path "$env:LOCALAPPDATA\QClaudeCode\desktop\mitm\api.anthropic.com.pfx"
+
+# 4. 网关运行且 TLS 响应
+Invoke-RestMethod http://127.0.0.1:8788/health
+Invoke-WebRequest https://api.anthropic.com/health -UseBasicParsing
+
+# 5. 443 端口由网关占用，而不是其他服务
+Get-NetTCPConnection -LocalPort 443 -State Listen
+```
+
+常见原因：
+
+- 安装时取消了 UAC：重新运行 `install.ps1` 并确认，或以管理员运行
+  `desktop\mitm\setup-mitm.ps1`。
+- 安装 MITM 前网关已在运行：重启网关
+  （`gateway\start.ps1 -Stop`，再 `gateway\start.ps1`）。
+- 其他进程占用 443：停止它，或使用 `-NoMitm` 和别的 Desktop 方案。
+- 企业 VPN/代理检查 TLS：不要在不理解证书链的情况下混用。
+- 使用了 `-NoMitm`：Desktop 未被拦截。手动安装：
+  ```powershell
+  .\desktop\mitm\setup-mitm.ps1        # 管理员
+  ```
+
+如果无法接受 MITM，可选：
 
 1. **CC Switch** — 第三方本地路由器，带 Desktop 面板，使用
    `127.0.0.1:15721`。
@@ -153,13 +183,6 @@ Claude Desktop 是最难的部分。它经常忽略：
    .\desktop\apply-desktop-policy.ps1   # 管理员
    ```
    重启 Desktop 并检查是否生效。
-3. **MITM** — 最可靠：
-   ```powershell
-   .\desktop\mitm\setup-mitm.ps1        # 管理员
-   ```
-   创建本地 CA、信任它、为 `api.anthropic.com` 签发证书、修改 `hosts`，并
-   生成网关 TLS 监听所需的 PFX。之后设置 `GATEWAY_TLS_PFX` 启动网关
-   （`gateway\gw-env.ps1` 会自动找到 PFX）。
 
 回滚：
 
@@ -168,7 +191,8 @@ Claude Desktop 是最难的部分。它经常忽略：
 .\desktop\revert-all.ps1              # 策略和 managed settings
 ```
 
-不要在未理解证书链的情况下把 MITM 与 VPN 或企业 TLS 检查混用。
+`uninstall.ps1` 会自动运行 MITM teardown 并请求 UAC。如果取消 UAC，会保留
+安装目录以便重试。
 
 ## 端口 8788 被占用
 

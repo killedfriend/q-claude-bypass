@@ -14,6 +14,8 @@
   OpenRouter.
 - Optional: `winget` (App Installer) for Claude Desktop. The installer falls
   back to a manual link if it is missing.
+- Administrator rights and UAC approval for the default Claude Desktop MITM
+  setup (hosts + Trusted Root). Use `-NoMitm` to skip it.
 
 Node.js, Claude Code and Claude Desktop do not have to be installed beforehand.
 
@@ -39,6 +41,13 @@ The installer asks for:
 
 The key is saved as a user environment variable and is never written to the
 repository.
+
+To pass installer switches (for example `-NoMitm`), download the script first:
+
+```powershell
+Invoke-WebRequest https://github.com/killedfriend/q-claude-bypass/releases/latest/download/install.ps1 -OutFile install.ps1
+.\install.ps1 -NoMitm
+```
 
 ### Non-interactive install
 
@@ -70,11 +79,12 @@ Run the script from a downloaded file to pass parameters:
 | `-Version` | Release version used for the download |
 | `-SkipNode` | Do not check or install Node.js |
 | `-SkipClaudeCode` | Do not install Claude Code |
-| `-SkipClaudeDesktop` | Do not install Claude Desktop |
+| `-SkipClaudeDesktop` | Do not install Claude Desktop or configure its MITM |
 | `-SkipAutostart` | Do not register the logon entry or start the gateway |
 | `-SkipSmokeTest` | Do not send the verification request |
 | `-NoPersistKey` | Keep the key only for this process (autostart will not see it) |
 | `-NoStart` | Do not start the gateway after installation |
+| `-NoMitm` | Skip the automatic Claude Desktop MITM (hosts, CA, port 443) |
 | `-ConfigureDesktop` | Apply the experimental Desktop policy (requires UAC) |
 
 ## What the installer changes
@@ -89,9 +99,17 @@ Run the script from a downloaded file to pass parameters:
 | `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` | `QClaudeGateway` logon entry |
 | User environment | Provider key variable, e.g. `DASHSCOPE_API_KEY` |
 | Optional, with `-ConfigureDesktop` | `C:\Program Files\ClaudeCode\managed-settings.json` and `HKLM\SOFTWARE\Policies\ClaudeCode` |
+| `%LOCALAPPDATA%\QClaudeCode\desktop\mitm` | Local CA certificate, `api.anthropic.com` PFX |
+| Windows `hosts` | `127.0.0.1 api.anthropic.com` (marked `# qclaude-mitm`) |
+| Windows Trusted Root | `CN=QClaude Local CA` |
 | `%LOCALAPPDATA%\QClaudeCode\gateway\logs` | Runtime logs |
 
 The installer does not modify Claude Code or Claude Desktop binaries.
+
+The MITM step is a machine-wide change. While the gateway is stopped,
+`api.anthropic.com` is unreachable on this machine because `hosts` points it to
+`127.0.0.1`. Uninstall reverts the hosts entry, certificates and PFX. Use
+`-NoMitm` if that trade-off is not acceptable.
 
 ## Verify
 
@@ -109,6 +127,16 @@ Invoke-RestMethod http://127.0.0.1:8788/health
 
 Expected fields include `"ok": true`, the selected `provider`, `routes`, and
 `keyConfigured: true`.
+
+Check TLS interception (MITM default):
+
+```powershell
+Invoke-WebRequest https://api.anthropic.com/health -UseBasicParsing
+```
+
+It should return the gateway health JSON through the trusted local certificate.
+If it fails, check that the gateway is running, port 443 is free, and the PFX
+exists in `%LOCALAPPDATA%\QClaudeCode\desktop\mitm`.
 
 Run a cheap request:
 
@@ -209,12 +237,29 @@ It keeps Claude Code, Claude Desktop and API keys by default. Add switches:
 
 `-KeepSettings` leaves Claude settings untouched.
 
+MITM cleanup runs automatically. If UAC is cancelled, the install directory is
+kept so you can retry:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\QClaudeCode\desktop\mitm\teardown-mitm.ps1"
+```
+
+`-NoMitmCleanup` skips this step and leaves the hosts/certificate changes in
+place.
+
 ## Claude Desktop
 
-The installer installs Desktop but does not redirect its traffic. Claude
-Desktop often ignores environment variables and managed-settings. See
-[troubleshooting](troubleshooting.md#claude-desktop) and the root README for the
-three options: CC Switch, experimental policy, or MITM.
+The installer configures Desktop through a local MITM by default:
+
+- local CA `CN=QClaude Local CA` in Trusted Root;
+- certificate `CN=api.anthropic.com` (SAN `api.anthropic.com`,
+  `*.anthropic.com`);
+- hosts entry `127.0.0.1 api.anthropic.com`;
+- PFX used by the gateway TLS listener on `127.0.0.1:443`.
+
+`-NoMitm` skips it. The experimental managed-settings policy is still available
+with `-ConfigureDesktop`, and CC Switch is a third-party alternative. See
+[troubleshooting](troubleshooting.md#claude-desktop).
 
 ## Next
 

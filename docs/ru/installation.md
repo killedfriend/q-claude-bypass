@@ -13,6 +13,8 @@
 - API-ключ DeepSeek, Tencent Cloud, Alibaba Cloud Model Studio или OpenRouter.
 - Желательно `winget` (App Installer) для Claude Desktop. Если его нет,
   установщик предложит ссылку для ручной установки.
+- Права администратора и подтверждение UAC для автоматического MITM Claude
+  Desktop (hosts + Trusted Root). Пропустить можно флагом `-NoMitm`.
 
 Node.js, Claude Code и Claude Desktop заранее устанавливать не нужно.
 
@@ -38,6 +40,13 @@ powershell -ExecutionPolicy Bypass -Command "irm https://github.com/killedfriend
 
 Ключ сохраняется в пользовательскую переменную окружения и не попадает в
 репозиторий.
+
+Чтобы передать параметры (например, `-NoMitm`), сначала скачайте скрипт:
+
+```powershell
+Invoke-WebRequest https://github.com/killedfriend/q-claude-bypass/releases/latest/download/install.ps1 -OutFile install.ps1
+.\install.ps1 -NoMitm
+```
 
 ### Неинтерактивная установка
 
@@ -69,11 +78,12 @@ PowerShell или в списке процессов. Лучше использ�
 | `-Version` | Версия релиза для загрузки |
 | `-SkipNode` | Не проверять и не устанавливать Node.js |
 | `-SkipClaudeCode` | Не устанавливать Claude Code |
-| `-SkipClaudeDesktop` | Не устанавливать Claude Desktop |
+| `-SkipClaudeDesktop` | Не устанавливать Claude Desktop и не настраивать его MITM |
 | `-SkipAutostart` | Не регистрировать автозапуск и не запускать шлюз |
 | `-SkipSmokeTest` | Не отправлять проверочный запрос |
 | `-NoPersistKey` | Хранить ключ только в текущем процессе (автозапуск его не увидит) |
 | `-NoStart` | Не запускать шлюз после установки |
+| `-NoMitm` | Пропустить автоматический MITM Claude Desktop (hosts, CA, порт 443) |
 | `-ConfigureDesktop` | Применить экспериментальную политику Desktop (нужен UAC) |
 
 ## Что меняет установщик
@@ -88,9 +98,17 @@ PowerShell или в списке процессов. Лучше использ�
 | `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` | Запись автозапуска `QClaudeGateway` |
 | Пользовательские переменные | Переменная ключа, например `DASHSCOPE_API_KEY` |
 | Опционально, с `-ConfigureDesktop` | `C:\Program Files\ClaudeCode\managed-settings.json` и `HKLM\SOFTWARE\Policies\ClaudeCode` |
+| `%LOCALAPPDATA%\QClaudeCode\desktop\mitm` | Локальный CA и PFX для `api.anthropic.com` |
+| Windows `hosts` | `127.0.0.1 api.anthropic.com` (с меткой `# qclaude-mitm`) |
+| Windows Trusted Root | `CN=QClaude Local CA` |
 | `%LOCALAPPDATA%\QClaudeCode\gateway\logs` | Рабочие логи |
 
 Бинарники Claude Code и Claude Desktop не изменяются.
+
+MITM — машинно-глобальное изменение. Пока шлюз остановлен, `api.anthropic.com`
+на этой машине недоступен, потому что `hosts` указывает на `127.0.0.1`.
+Удаление возвращает hosts, сертификаты и PFX назад. Если такой компромисс не
+подходит, используйте `-NoMitm`.
 
 ## Проверка
 
@@ -108,6 +126,16 @@ Invoke-RestMethod http://127.0.0.1:8788/health
 
 Ожидаемые поля: `"ok": true`, выбранный `provider`, `routes`,
 `keyConfigured: true`.
+
+Проверка TLS-перехвата (MITM по умолчанию):
+
+```powershell
+Invoke-WebRequest https://api.anthropic.com/health -UseBasicParsing
+```
+
+Должен вернуться JSON здоровья шлюза через доверенный локальный сертификат.
+Если не работает, проверьте, что шлюз запущен, порт 443 свободен, а PFX лежит в
+`%LOCALAPPDATA%\QClaudeCode\desktop\mitm`.
 
 Дешёвый проверочный запрос:
 
@@ -209,12 +237,28 @@ Claude Code, Claude Desktop и API-ключи по умолчанию остаю
 
 `-KeepSettings` оставляет настройки Claude нетронутыми.
 
+Очистка MITM выполняется автоматически. Если отменить UAC, установочный каталог
+сохраняется, чтобы можно было повторить:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\QClaudeCode\desktop\mitm\teardown-mitm.ps1"
+```
+
+`-NoMitmCleanup` пропускает очистку и оставляет hosts/сертификаты.
+
 ## Claude Desktop
 
-Установщик ставит Desktop, но не перенаправляет его трафик. Claude Desktop часто
-игнорирует переменные окружения и managed-settings. См.
-[диагностику](troubleshooting.md#claude-desktop) и корневой README: есть три
-варианта — CC Switch, экспериментальная политика или MITM.
+Установщик по умолчанию настраивает Desktop через локальный MITM:
+
+- CA `CN=QClaude Local CA` в Trusted Root;
+- сертификат `CN=api.anthropic.com` (SAN `api.anthropic.com`,
+  `*.anthropic.com`);
+- запись hosts `127.0.0.1 api.anthropic.com`;
+- PFX для TLS-слушателя шлюза на `127.0.0.1:443`.
+
+`-NoMitm` пропускает этот шаг. Экспериментальная политика managed-settings
+доступна через `-ConfigureDesktop`, а CC Switch — сторонняя альтернатива. См.
+[диагностику](troubleshooting.md#claude-desktop).
 
 ## Дальше
 

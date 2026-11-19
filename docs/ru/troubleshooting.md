@@ -149,14 +149,47 @@ https://api.deepseek.com/anthropic
 
 ## Claude Desktop
 
-Claude Desktop — самая сложная часть. Он часто игнорирует:
+Установщик теперь настраивает Claude Desktop через локальный MITM **по
+умолчанию**: создаёт CA в Trusted Root, выпускает сертификат для
+`api.anthropic.com`, добавляет `127.0.0.1 api.anthropic.com` в `hosts` и пишет
+PFX для TLS-слушателя шлюза на порту 443. Нужно подтверждение UAC.
 
-- переменные окружения процесса;
-- `C:\Program Files\ClaudeCode\managed-settings.json` (путь CLI);
-- `HKLM\SOFTWARE\Policies\ClaudeCode` (в логе
-  `[managedConfig] type: 'none'`).
+Если Desktop всё равно не подключается, проверьте по порядку:
 
-Варианты от мягкого к жёсткому:
+```powershell
+# 1. запись hosts
+Select-String "$env:SystemRoot\System32\drivers\etc\hosts" -Pattern 'qclaude-mitm'
+
+# 2. CA доверен
+Get-ChildItem Cert:\LocalMachine\Root | Where-Object Subject -eq 'CN=QClaude Local CA'
+
+# 3. PFX существует
+Test-Path "$env:LOCALAPPDATA\QClaudeCode\desktop\mitm\api.anthropic.com.pfx"
+
+# 4. шлюз работает и TLS отвечает
+Invoke-RestMethod http://127.0.0.1:8788/health
+Invoke-WebRequest https://api.anthropic.com/health -UseBasicParsing
+
+# 5. порт 443 занят шлюзом, а не другим сервисом
+Get-NetTCPConnection -LocalPort 443 -State Listen
+```
+
+Частые причины:
+
+- UAC отменён при установке: запустите `install.ps1` снова и подтвердите, либо
+  выполните `desktop\mitm\setup-mitm.ps1` от администратора.
+- Шлюз уже работал до установки MITM: перезапустите его
+  (`gateway\start.ps1 -Stop`, затем `gateway\start.ps1`).
+- Порт 443 занят другим процессом: остановите его или используйте `-NoMitm` и
+  другой способ для Desktop.
+- Корпоративный VPN/прокси перехватывает TLS: не совмещайте без понимания
+  цепочки сертификатов.
+- Использован `-NoMitm`: Desktop не перехватывается. Установите MITM вручную:
+  ```powershell
+  .\desktop\mitm\setup-mitm.ps1        # администратор
+  ```
+
+Альтернативы, если MITM не подходит:
 
 1. **CC Switch** — сторонний локальный роутер с панелью Desktop. Держит свой
    шлюз на `127.0.0.1:15721`.
@@ -165,14 +198,6 @@ Claude Desktop — самая сложная часть. Он часто игн�
    .\desktop\apply-desktop-policy.ps1   # администратор
    ```
    Перезапустите Desktop и проверьте, применяются ли настройки.
-3. **MITM** — самый надёжный:
-   ```powershell
-   .\desktop\mitm\setup-mitm.ps1        # администратор
-   ```
-   Создаёт локальный CA, доверяет ему, выпускает сертификат для
-   `api.anthropic.com`, правит `hosts` и пишет PFX для TLS-слушателя шлюза.
-   Затем запустите шлюз с `GATEWAY_TLS_PFX` (helper `gateway\gw-env.ps1` находит
-   PFX сам).
 
 Откат:
 
@@ -181,8 +206,8 @@ Claude Desktop — самая сложная часть. Он часто игн�
 .\desktop\revert-all.ps1              # политики и managed settings
 ```
 
-Не совмещайте MITM с VPN или корпоративной TLS-инспекцией без понимания цепочки
-сертификатов.
+`uninstall.ps1` сам запускает teardown MITM и запрашивает UAC. Если UAC отменён,
+установочный каталог сохраняется, чтобы можно было повторить очистку.
 
 ## Порт 8788 занят
 

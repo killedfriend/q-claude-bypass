@@ -39,7 +39,7 @@ non-Anthropic backend without forking Claude Code or patching its binaries?
 - **Context pruning.** Old tool results are elided so long sessions stop
   resending hundreds of thousands of tokens every turn.
 - **Windows installer.** One command: Node.js, Claude Code, Claude Desktop,
-  gateway, autostart, and a key smoke test.
+  gateway, automatic Desktop MITM, autostart, and a key smoke test.
 - **Documentation in three languages** and settings examples for every
   provider.
 
@@ -108,9 +108,13 @@ The installer:
 4. copies the gateway to `%LOCALAPPDATA%\QClaudeCode`;
 5. asks for a provider and API key (hidden input) and stores the key in a user
    environment variable;
-6. adds the gateway to autostart at
+6. **configures MITM for Claude Desktop automatically**: local CA, trusted root,
+   `api.anthropic.com` certificate, hosts entry, and a PFX for the gateway TLS
+   listener. This step asks for UAC approval; use `-NoMitm` to skip it;
+7. adds the gateway to autostart at
    `HKCU\...\Run\QClaudeGateway`;
-7. starts the gateway and sends one cheap request to verify the key.
+8. starts the gateway, verifies TLS interception, and sends one cheap request
+   to verify the key.
 
 Non-interactive install:
 
@@ -206,20 +210,30 @@ stored in the repository.
 
 ## Claude Desktop
 
-The installer installs Claude Desktop but does **not** redirect its traffic
-automatically: the app does not always read environment variables and
-managed-settings. Options:
+The installer **sets up MITM for Claude Desktop by default**: it creates a local
+CA, adds it to Trusted Root, issues a certificate for `api.anthropic.com`,
+points that host at `127.0.0.1` through `hosts`, and enables the gateway TLS
+listener on port 443. Administrator rights and UAC approval are required.
+
+Skip automatic MITM:
+
+```powershell
+.\install.ps1 -NoMitm
+```
+
+MITM is machine-wide: while the gateway is stopped, `api.anthropic.com` is
+unreachable on this machine. Uninstall reverts it automatically
+(`uninstall.ps1` calls teardown; if UAC is cancelled, the install directory is
+kept so cleanup can be retried).
+
+Alternatives if MITM is not acceptable:
 
 1. **CC Switch** — a third-party utility with local routing for Desktop.
 2. **Experimental policy** — `install.ps1 -ConfigureDesktop` writes
    managed-settings and the registry policy; some Desktop builds ignore them.
-3. **MITM** — `desktop/mitm/setup-mitm.ps1` creates a local CA and a certificate
-   for `api.anthropic.com`, edits `hosts`, and enables the gateway TLS listener.
-   This is the most reliable but also the most invasive method; administrator
-   rights are required.
 
 Read [`docs/en/troubleshooting.md`](docs/en/troubleshooting.md) and the security
-section before using MITM. Rollback:
+section before using MITM. Manual rollback:
 `desktop/mitm/teardown-mitm.ps1`.
 
 ## Security and limitations

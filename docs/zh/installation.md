@@ -12,6 +12,8 @@
 - DeepSeek、腾讯云、阿里云百炼或 OpenRouter 的 API 密钥。
 - 建议安装 `winget`（应用安装程序）。如果没有，安装器会给出 Claude Desktop
   的手动下载链接。
+- 默认 Claude Desktop MITM 需要管理员权限和 UAC 确认（hosts + 受信任根证书）。
+  可用 `-NoMitm` 跳过。
 
 无需提前安装 Node.js、Claude Code 或 Claude Desktop。
 
@@ -35,6 +37,13 @@ powershell -ExecutionPolicy Bypass -Command "irm https://github.com/killedfriend
 2. API 密钥（隐藏输入）。
 
 密钥会保存为用户环境变量，不会写入仓库。
+
+如需传递参数（例如 `-NoMitm`），请先下载脚本：
+
+```powershell
+Invoke-WebRequest https://github.com/killedfriend/q-claude-bypass/releases/latest/download/install.ps1 -OutFile install.ps1
+.\install.ps1 -NoMitm
+```
 
 ### 非交互安装
 
@@ -66,11 +75,12 @@ irm https://github.com/killedfriend/q-claude-bypass/releases/latest/download/ins
 | `-Version` | 下载的发布版本 |
 | `-SkipNode` | 不检查或安装 Node.js |
 | `-SkipClaudeCode` | 不安装 Claude Code |
-| `-SkipClaudeDesktop` | 不安装 Claude Desktop |
+| `-SkipClaudeDesktop` | 不安装 Claude Desktop，也不配置其 MITM |
 | `-SkipAutostart` | 不注册自启，也不启动网关 |
 | `-SkipSmokeTest` | 不发送验证请求 |
 | `-NoPersistKey` | 密钥只保留在当前进程（自启将看不到） |
 | `-NoStart` | 安装后不启动网关 |
+| `-NoMitm` | 跳过自动 Claude Desktop MITM（hosts、CA、443 端口） |
 | `-ConfigureDesktop` | 应用实验性 Desktop 策略（需要 UAC） |
 
 ## 安装器会修改什么
@@ -85,9 +95,16 @@ irm https://github.com/killedfriend/q-claude-bypass/releases/latest/download/ins
 | `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` | 注册 `QClaudeGateway` 自启项 |
 | 用户环境变量 | 密钥变量，例如 `DASHSCOPE_API_KEY` |
 | 可选，`-ConfigureDesktop` | `C:\Program Files\ClaudeCode\managed-settings.json` 和 `HKLM\SOFTWARE\Policies\ClaudeCode` |
+| `%LOCALAPPDATA%\QClaudeCode\desktop\mitm` | 本地 CA 和 `api.anthropic.com` PFX |
+| Windows `hosts` | `127.0.0.1 api.anthropic.com`（标记 `# qclaude-mitm`） |
+| Windows 受信任根 | `CN=QClaude Local CA` |
 | `%LOCALAPPDATA%\QClaudeCode\gateway\logs` | 运行日志 |
 
 安装器不会修改 Claude Code 或 Claude Desktop 的二进制文件。
+
+MITM 是机器级修改。网关停止时，本机无法访问 `api.anthropic.com`，因为
+`hosts` 指向 `127.0.0.1`。卸载会恢复 hosts、证书和 PFX。如果无法接受这种
+取舍，请使用 `-NoMitm`。
 
 ## 验证
 
@@ -104,6 +121,15 @@ Invoke-RestMethod http://127.0.0.1:8788/health
 ```
 
 应看到 `"ok": true`、所选 `provider`、`routes` 和 `keyConfigured: true`。
+
+检查 TLS 拦截（默认 MITM）：
+
+```powershell
+Invoke-WebRequest https://api.anthropic.com/health -UseBasicParsing
+```
+
+应通过受信任的本地证书返回网关健康 JSON。若失败，请检查网关是否运行、443
+端口是否空闲、PFX 是否位于 `%LOCALAPPDATA%\QClaudeCode\desktop\mitm`。
 
 发送一次低价请求：
 
@@ -203,12 +229,26 @@ irm https://github.com/killedfriend/q-claude-bypass/releases/latest/download/uni
 
 `-KeepSettings` 保留 Claude 设置。
 
+MITM 清理会自动执行。如果取消 UAC，安装目录会保留，便于重试：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\QClaudeCode\desktop\mitm\teardown-mitm.ps1"
+```
+
+`-NoMitmCleanup` 跳过清理，保留 hosts/证书修改。
+
 ## Claude Desktop
 
-安装器会安装 Desktop，但不会重定向它的流量。Claude Desktop 经常忽略环境变量
-和 managed-settings。参见
-[故障排查](troubleshooting.md#claude-desktop)和根 README：可选 CC Switch、
-实验性策略或 MITM。
+安装器默认通过本地 MITM 配置 Desktop：
+
+- 受信任根中的 CA `CN=QClaude Local CA`；
+- 证书 `CN=api.anthropic.com`（SAN `api.anthropic.com`、`*.anthropic.com`）；
+- hosts 记录 `127.0.0.1 api.anthropic.com`；
+- 网关 `127.0.0.1:443` TLS 监听使用的 PFX。
+
+`-NoMitm` 可跳过。实验性 managed-settings 策略仍可通过 `-ConfigureDesktop`
+启用，CC Switch 是第三方替代方案。参见
+[故障排查](troubleshooting.md#claude-desktop)。
 
 ## 下一步
 

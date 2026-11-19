@@ -3,6 +3,19 @@
 All notable changes are documented here. The project is educational and
 non-commercial; compatibility is best-effort.
 
+## 1.0.3 — 2026-11-19
+
+- Claude Desktop MITM is now installed automatically by default:
+  local CA, Trusted Root, `api.anthropic.com` certificate, hosts entry, and
+  gateway TLS listener on port 443.
+- UAC elevation is handled by the installer; `-NoMitm` opts out and
+  `-SkipClaudeDesktop` skips both Desktop and MITM.
+- `setup-mitm.ps1` is idempotent and returns proper exit codes.
+- `uninstall.ps1` tears MITM down automatically; if UAC is cancelled, it keeps
+  the install directory so cleanup can be retried.
+- Added an HTTPS interception check to the installer.
+- Updated all three language docs and the security notes.
+
 ## 1.0.2 — 2026-11-19
 
 - The installer now creates `qclaude.cmd` and `qclaude-gw.cmd` in

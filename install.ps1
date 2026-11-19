@@ -5,8 +5,13 @@
 
 .DESCRIPTION
   Installs Node.js if needed, Claude Code (npm), Claude Desktop (winget),
-  the local gateway, and a per-user logon autostart entry. Then runs a smoke
-  test against the selected provider.
+  the local gateway, a per-user logon autostart entry, and a local MITM
+  certificate/hosts entry so Claude Desktop uses the gateway. Then runs a
+  smoke test against the selected provider.
+
+  MITM setup requires administrator rights and changes the machine-wide hosts
+  file and Trusted Root store. Use -NoMitm to skip it, and uninstall.ps1 to
+  revert it.
 
   Educational / non-commercial project. Use at your own risk.
 
@@ -31,7 +36,7 @@ param(
 
     [string]$Repo = 'killedfriend/q-claude-bypass',
 
-    [string]$Version = '1.0.2',
+    [string]$Version = '1.0.3',
 
     [switch]$SkipNode,
     [switch]$SkipClaudeCode,
@@ -40,6 +45,7 @@ param(
     [switch]$SkipSmokeTest,
     [switch]$NoPersistKey,
     [switch]$NoStart,
+    [switch]$NoMitm,
     [switch]$ConfigureDesktop
 )
 
@@ -49,6 +55,7 @@ $ProgressPreference = 'SilentlyContinue'
 
 $script:TempDir = $null
 $script:Problems = @()
+$script:MitmOk = $false
 
 function Write-Step($text) {
     Write-Host ''
@@ -62,6 +69,12 @@ function Test-Admin {
     $id = [Security.Principal.WindowsIdentity]::GetCurrent()
     $p = New-Object Security.Principal.WindowsPrincipal($id)
     return $p.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+function Invoke-ElevatedScript([string]$ScriptPath) {
+    $argLine = "-NoProfile -ExecutionPolicy Bypass -File `"$ScriptPath`""
+    $p = Start-Process -FilePath 'powershell.exe' -Verb RunAs -Wait -PassThru -ArgumentList $argLine
+    return $p.ExitCode
 }
 
 function Refresh-Path {
@@ -515,6 +528,61 @@ function Invoke-SmokeTest {
     }
 }
 
+function Install-Mitm {
+    if ($NoMitm -or $SkipClaudeDesktop) {
+        Write-Step 'Claude Desktop MITM'
+        Write-Ok 'skipped'
+        return
+    }
+
+    Write-Step 'Claude Desktop MITM'
+    $helper = Join-Path $InstallDir 'desktop\mitm\setup-mitm.ps1'
+    $pfx = Join-Path $InstallDir 'desktop\mitm\api.anthropic.com.pfx'
+    if (-not (Test-Path $helper)) { Write-Warn 'MITM helper not found'; return }
+
+    try {
+        if (Test-Admin) {
+            & $helper
+            $code = $LASTEXITCODE
+        } else {
+            Write-Host '    administrator rights are required; accepting the UAC prompt...'
+            $code = Invoke-ElevatedScript $helper
+        }
+    } catch {
+        Write-Warn 'MITM was not installed (UAC cancelled or helper failed)'
+        return
+    }
+
+    if ($code -ne 0) {
+        Write-Warn "MITM helper returned exit code $code"
+        return
+    }
+    if (-not (Test-Path $pfx)) {
+        Write-Warn 'MITM finished without a PFX; Claude Desktop traffic is not intercepted'
+        return
+    }
+
+    Write-Ok 'local CA trusted, hosts points api.anthropic.com to 127.0.0.1'
+    Write-Ok "PFX ready: $pfx"
+    $script:MitmOk = $true
+}
+
+function Test-Mitm {
+    if ($NoMitm -or $SkipClaudeDesktop -or $NoStart) { return }
+    Write-Step 'MITM check'
+    try {
+        $r = Invoke-WebRequest 'https://api.anthropic.com/health' -UseBasicParsing -TimeoutSec 8
+        if ($r.StatusCode -eq 200) {
+            Write-Ok 'TLS interception is served by the gateway'
+        } else {
+            Write-Warn "TLS interception returned HTTP $($r.StatusCode)"
+        }
+    } catch {
+        Write-Warn "could not verify TLS interception: $($_.Exception.Message)"
+        Write-Host '    check host port 443, the PFX and the local CA trust' -ForegroundColor DarkYellow
+    }
+}
+
 function Configure-DesktopPolicy {
     if (-not $ConfigureDesktop) { return }
     Write-Step 'Claude Desktop policy (optional)'
@@ -567,8 +635,14 @@ try {
     Set-ApiKey -ProviderId $providerId -ProviderFile (Join-Path $InstallDir "gateway\providers\$providerId.json")
     Configure-ClaudeClient -GatewayDir (Join-Path $InstallDir 'gateway') -ClaudeHomeDir $ClaudeHome
     Configure-DesktopPolicy
+    Install-Mitm
 
-    if (-not $SkipAutostart) { Install-Autostart -GatewayDir (Join-Path $InstallDir 'gateway') }
+    if (-not $SkipAutostart) {
+        Install-Autostart -GatewayDir (Join-Path $InstallDir 'gateway')
+    } elseif (-not $NoMitm -and -not $SkipClaudeDesktop) {
+        Write-Warn 'MITM is installed but autostart was skipped; Claude Desktop will not connect until the gateway is running'
+    }
+    Test-Mitm
     Invoke-SmokeTest
 
     $installMeta = [ordered]@{
@@ -577,11 +651,22 @@ try {
         installDir  = $InstallDir
         installedAt = (Get-Date).ToUniversalTime().ToString('o')
         repo        = $Repo
+        mitm        = [bool]$script:MitmOk
+        mitmRequested = (-not $NoMitm -and -not $SkipClaudeDesktop)
     }
     Write-Utf8NoBom (Join-Path $InstallDir 'install.json') ($installMeta | ConvertTo-Json)
 
     Write-Step 'Done'
     Write-Host "    gateway : http://127.0.0.1:8788"
+    if ($NoMitm) {
+        Write-Host '    desktop : not intercepted (-NoMitm)'
+    } elseif ($SkipClaudeDesktop) {
+        Write-Host '    desktop : not installed (-SkipClaudeDesktop)'
+    } elseif ($script:MitmOk) {
+        Write-Host '    desktop : MITM on https://api.anthropic.com'
+    } else {
+        Write-Host '    desktop : MITM was requested but is not active; see warnings' -ForegroundColor Yellow
+    }
     Write-Host "    logs    : $InstallDir\gateway\logs"
     Write-Host "    launch  : qclaude-gw"
     Write-Host "    report  : node `"$InstallDir\gateway\report.mjs`""

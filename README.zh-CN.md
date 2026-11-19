@@ -34,7 +34,7 @@ Claude Desktop 使用第三方模型。客户端与模型服务之间有一个�
 - **上下文裁剪。** 旧的工具结果会被替换为占位文本，避免长会话每轮重发几十万
   Token。
 - **Windows 安装器。** 一条命令完成 Node.js、Claude Code、Claude Desktop、
-  网关、开机自启和密钥检查。
+  网关、Desktop 自动 MITM、开机自启和密钥检查。
 - **三语文档**以及每个服务商的配置示例。
 
 ## 工作原理
@@ -99,8 +99,11 @@ powershell -ExecutionPolicy Bypass -Command "irm https://github.com/killedfriend
 3. 通过 `winget install Anthropic.Claude` 安装 Claude Desktop；
 4. 把网关复制到 `%LOCALAPPDATA%\QClaudeCode`；
 5. 询问服务商和 API 密钥（输入隐藏），并保存到用户环境变量；
-6. 在 `HKCU\...\Run\QClaudeGateway` 注册开机自启；
-7. 启动网关并发送一次低价请求验证密钥。
+6. **自动为 Claude Desktop 配置 MITM**：本地 CA、受信任根证书、
+   `api.anthropic.com` 证书、hosts 记录，以及网关 TLS 监听所需的 PFX。
+   此步骤需要 UAC 确认；可用 `-NoMitm` 跳过；
+7. 在 `HKCU\...\Run\QClaudeGateway` 注册开机自启；
+8. 启动网关，检查 TLS 拦截，并发送一次低价请求验证密钥。
 
 非交互安装：
 
@@ -193,18 +196,27 @@ English: [`docs/en`](docs/en) · Русский: [`docs/ru`](docs/ru).
 
 ## Claude Desktop
 
-安装器会安装 Claude Desktop，但**不会**自动重定向它的流量：该应用并不总是
-读取环境变量和 managed-settings。可选方案：
+安装器**默认自动配置 MITM**：创建本地 CA、加入受信任根证书、为
+`api.anthropic.com` 签发证书、通过 `hosts` 把该域名指向 `127.0.0.1`，并启用
+网关的 443 端口 TLS 监听。需要管理员权限和 UAC 确认。
+
+跳过自动 MITM：
+
+```powershell
+.\install.ps1 -NoMitm
+```
+
+MITM 是机器级修改：网关停止时，本机无法访问 `api.anthropic.com`。卸载会自动
+回滚（`uninstall.ps1` 调用 teardown；如果取消 UAC，安装目录会保留以便重试）。
+
+如果无法接受 MITM，可选：
 
 1. **CC Switch** — 第三方工具，可为 Desktop 提供本地路由。
 2. **实验性策略** — `install.ps1 -ConfigureDesktop` 写入 managed-settings 和
    注册表策略；部分 Desktop 版本会忽略它们。
-3. **MITM** — `desktop/mitm/setup-mitm.ps1` 创建本地 CA 和
-   `api.anthropic.com` 证书，修改 `hosts`，并启用网关 TLS 监听。这是最可靠
-   但侵入性最强的方法，需要管理员权限。
 
 使用 MITM 前请阅读 [`docs/zh/troubleshooting.md`](docs/zh/troubleshooting.md)
-和安全说明。回滚：`desktop/mitm/teardown-mitm.ps1`。
+和安全说明。手动回滚：`desktop/mitm/teardown-mitm.ps1`。
 
 ## 安全与限制
 

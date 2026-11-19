@@ -310,6 +310,11 @@ HKCU\Software\Microsoft\Windows\CurrentVersion\Run\QClaudeGateway
 在 `gateway\logs\requests.jsonl`；启动错误请在终端运行 `gateway\start.ps1`
 查看。不需要管理员权限，也不是 Windows 服务。
 
+如果存在 `desktop\mitm\api.anthropic.com.pfx`，`gateway\gw-env.ps1` 会自动
+设置 `GATEWAY_TLS_PFX`，网关还会监听 `https://127.0.0.1:443`，供 Claude
+Desktop MITM 使用。删除 PFX（或运行 `desktop\mitm\teardown-mitm.ps1`）并重启
+网关即可禁用。
+
 禁用：
 
 ```powershell

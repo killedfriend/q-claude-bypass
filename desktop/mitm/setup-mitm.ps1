@@ -1,6 +1,7 @@
 #Requires -RunAsAdministrator
 # Creates a local CA, issues a cert for api.anthropic.com, trusts the CA,
-# and points api.anthropic.com at localhost.
+# points api.anthropic.com at localhost, and writes the PFX used by the gateway.
+# Idempotent: reuses the CA and replaces the leaf certificate.
 $ErrorActionPreference = 'Stop'
 $log = Join-Path $PSScriptRoot 'setup.log'
 Start-Transcript -Path $log -Force | Out-Null
@@ -10,7 +11,7 @@ try {
     $pfx = Join-Path $here 'api.anthropic.com.pfx'
     $pfxPass = 'qclaude'
 
-    Write-Host '1/3 CA' -ForegroundColor Cyan
+    Write-Host '1/4 CA' -ForegroundColor Cyan
     $ca = Get-ChildItem Cert:\LocalMachine\My |
         Where-Object { $_.Subject -eq 'CN=QClaude Local CA' } |
         Select-Object -First 1
@@ -32,6 +33,7 @@ try {
         Where-Object { $_.Thumbprint -eq $ca.Thumbprint }
     if (-not $trusted) {
         $tmp = Join-Path $here 'ca.cer'
+        if (Test-Path $tmp) { Remove-Item $tmp -Force }
         Export-Certificate -Cert $ca -FilePath $tmp -Type CERT | Out-Null
         Import-Certificate -FilePath $tmp -CertStoreLocation Cert:\LocalMachine\Root | Out-Null
         Remove-Item $tmp -Force
@@ -40,7 +42,7 @@ try {
         Write-Host '  already trusted'
     }
 
-    Write-Host '2/3 leaf certificate' -ForegroundColor Cyan
+    Write-Host '2/4 leaf certificate' -ForegroundColor Cyan
     Get-ChildItem Cert:\LocalMachine\My |
         Where-Object { $_.Subject -eq 'CN=api.anthropic.com' } |
         ForEach-Object { Remove-Item -Path $_.PSPath -Force }
@@ -54,26 +56,33 @@ try {
         -NotAfter (Get-Date).AddYears(2) `
         -KeyExportPolicy Exportable
 
+    if (Test-Path $pfx) { Remove-Item $pfx -Force }
     $pwd = ConvertTo-SecureString -String $pfxPass -AsPlainText -Force
     Export-PfxCertificate -Cert $leaf -FilePath $pfx -Password $pwd | Out-Null
     Write-Host "  leaf $($leaf.Thumbprint)"
     Write-Host "  pfx  $pfx (passphrase: $pfxPass)"
 
-    Write-Host '3/3 hosts file' -ForegroundColor Cyan
+    Write-Host '3/4 hosts file' -ForegroundColor Cyan
     $hosts = "$env:SystemRoot\System32\drivers\etc\hosts"
     $lines = Get-Content $hosts | Where-Object { $_ -notmatch 'qclaude-mitm' -and $_ -notmatch '^\s*127\.0\.0\.1\s+api\.anthropic\.com\s*$' }
     $lines += ''
     $lines += '# qclaude-mitm'
     $lines += '127.0.0.1 api.anthropic.com'
     Set-Content -Path $hosts -Value $lines -Encoding ASCII
+
+    $check = Select-String -Path $hosts -Pattern '^\s*127\.0\.0\.1\s+api\.anthropic\.com\s*$' -Quiet
+    if (-not $check) { throw 'hosts entry was not written' }
     Write-Host '  hosts updated'
 
-    Write-Host ''
-    Write-Host "DONE. Start the gateway with GATEWAY_TLS_PFX=$pfx" -ForegroundColor Green
+    Write-Host '4/4 done' -ForegroundColor Green
+    Write-Host "PFX: $pfx"
+    Write-Host 'Restart the gateway so it starts the TLS listener on 127.0.0.1:443.'
+    exit 0
 }
 catch {
     Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host $_.ScriptStackTrace
+    exit 1
 }
 finally {
     Stop-Transcript | Out-Null

@@ -319,6 +319,11 @@ HKCU\Software\Microsoft\Windows\CurrentVersion\Run\QClaudeGateway
 `gateway\start.ps1` в терминале. Права администратора и служба Windows не
 нужны.
 
+Если существует `desktop\mitm\api.anthropic.com.pfx`, `gateway\gw-env.ps1`
+автоматически выставляет `GATEWAY_TLS_PFX`, и шлюз дополнительно слушает
+`https://127.0.0.1:443` для MITM Claude Desktop. Удалите PFX (или выполните
+`desktop\mitm\teardown-mitm.ps1`) и перезапустите шлюз, чтобы отключить.
+
 Отключение:
 
 ```powershell
