@@ -23,7 +23,8 @@
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('deepseek', 'tencent', 'alibaba', 'openrouter')]
+    # No ValidateSet here: Windows PowerShell rejects an unbound ValidateSet
+    # parameter when the script is piped into Invoke-Expression (irm | iex).
     [string]$Provider,
 
     [string]$ApiKey,
@@ -36,7 +37,7 @@ param(
 
     [string]$Repo = 'killedfriend/q-claude-bypass',
 
-    [string]$Version = '1.0.4',
+    [string]$Version = '1.0.5',
 
     [switch]$SkipNode,
     [switch]$SkipClaudeCode,

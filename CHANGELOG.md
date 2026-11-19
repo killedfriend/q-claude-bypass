@@ -3,6 +3,12 @@
 All notable changes are documented here. The project is educational and
 non-commercial; compatibility is best-effort.
 
+## 1.0.5 — 2026-11-19
+
+- Fixed `irm ... | iex`: the unbound `ValidateSet` on `-Provider` made Windows
+  PowerShell fail before the installer started. The provider is now validated
+  in the script body.
+
 ## 1.0.4 — 2026-11-19
 
 - The MITM HTTPS check runs only after the certificate and hosts setup actually
