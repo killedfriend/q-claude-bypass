@@ -78,6 +78,9 @@ Wrong network or token can cause permanent loss.
 | Solana | `FPiVkxdNqJENgmF3Qib8wQR6oewYjwzZjSBBLtfMY6UH` |
 | BNB Smart Chain (BEP20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
 
+**Дополнительно / Also / 另外:** [CloudTips](https://pay.cloudtips.ru/p/04b8daec) —
+карты РФ / Russian cards. Крипта остаётся основным каналом.
+
 Details and warnings: [RU](docs/ru/support.md) · [EN](docs/en/support.md) · [中文](docs/zh/support.md).
 
 ## License

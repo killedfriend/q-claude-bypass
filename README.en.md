@@ -205,7 +205,7 @@ stored in the repository.
   budgets, environment variables.
 - [Troubleshooting](docs/en/troubleshooting.md) — 401/404/429, models, Desktop,
   port, Node.js, UAC.
-- [Support the author](docs/en/support.md) — USDT addresses and warnings.
+- [Support the author](docs/en/support.md) — USDT addresses, CloudTips and warnings.
 
 Русский: [`docs/ru`](docs/ru) · 中文: [`docs/zh`](docs/zh).
 
@@ -270,6 +270,11 @@ a transfer on the wrong network can cause permanent loss of funds.
 
 Verify the address and network before sending; use a small test amount first.
 Donations are voluntary and do not grant rights, warranties or obligations.
+
+Additional channel for Russian cards:
+[CloudTips](https://pay.cloudtips.ru/p/04b8daec). Crypto remains the primary
+channel.
+
 Details: [docs/en/support.md](docs/en/support.md).
 
 ## License

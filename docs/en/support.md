@@ -36,8 +36,15 @@ restrictions.
 Donations may have tax consequences. This is not legal or tax advice; consult a
 qualified specialist if receipts become regular.
 
-## Other methods
+## Additional method
 
-If you prefer a Russian platform (Boosty, DonationAlerts, YooMoney, etc.), the
-author may add a link later. Only the details the author is ready to disclose are
-published in this repository.
+If crypto is not convenient, you can support the project with a Russian card:
+
+**[CloudTips](https://pay.cloudtips.ru/p/04b8daec)**
+
+Crypto remains the primary channel. CloudTips is an additional option for people
+without USDT. The platform may charge a fee and requires compliance with its
+terms; a donation is still voluntary and grants no rights or warranties.
+
+Other platforms (Boosty, DonationAlerts, YooMoney) may be added later. Only the
+details the author is ready to disclose are published in this repository.

@@ -191,7 +191,7 @@ $env:GATEWAY_PROVIDER = 'alibaba'
 - [配置](docs/zh/configuration.md) — 网关、路由、计价、日志、预算、环境变量。
 - [故障排查](docs/zh/troubleshooting.md) — 401/404/429、模型、Desktop、端口、
   Node.js、UAC。
-- [支持作者](docs/zh/support.md) — USDT 地址和注意事项。
+- [支持作者](docs/zh/support.md) — USDT 地址、CloudTips 和注意事项。
 
 English: [`docs/en`](docs/en) · Русский: [`docs/ru`](docs/ru).
 
@@ -249,7 +249,12 @@ MITM 是机器级修改：网关停止时，本机无法访问 `api.anthropic.co
 | BNB Smart Chain (BEP20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
 
 转账前请核对地址和网络，第一次先发送小额测试。捐赠完全自愿，不构成任何权利、
-担保或义务。详情：[docs/zh/support.md](docs/zh/support.md)。
+担保或义务。
+
+俄罗斯银行卡的附加渠道：
+[CloudTips](https://pay.cloudtips.ru/p/04b8daec)。加密货币仍是主要渠道。
+
+详情：[docs/zh/support.md](docs/zh/support.md)。
 
 ## 许可证
 
