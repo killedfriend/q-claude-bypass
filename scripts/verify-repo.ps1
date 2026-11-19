@@ -58,8 +58,15 @@ Get-ChildItem $root -Recurse -File | Where-Object {
 
 if (-not $SkipTests) {
     Write-Host 'Node tests' -ForegroundColor Cyan
-    & npm test 2>&1 | Out-Host
-    if ($LASTEXITCODE -ne 0) { $problems += 'npm test failed' }
+    # Use npm.cmd: Windows PowerShell 5.1 mangles arguments through npm.ps1.
+    $npm = Get-Command npm.cmd -ErrorAction SilentlyContinue
+    if (-not $npm) { $npm = Get-Command npm -ErrorAction SilentlyContinue }
+    if (-not $npm) {
+        $problems += 'npm not found'
+    } else {
+        & $npm.Source test 2>&1 | Out-Host
+        if ($LASTEXITCODE -ne 0) { $problems += 'npm test failed' }
+    }
 }
 
 Write-Host ''
