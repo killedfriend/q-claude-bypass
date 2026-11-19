@@ -265,3 +265,4 @@ powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\QClaudeCode\desktop\
 - [Провайдеры](providers.md)
 - [Конфигурация](configuration.md)
 - [Диагностика](troubleshooting.md)
+- [Поддержать автора](support.md)

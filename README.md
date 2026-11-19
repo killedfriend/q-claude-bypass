@@ -62,6 +62,23 @@ hosts/certificate changes.
 | Providers | [providers](docs/ru/providers.md) | [providers](docs/en/providers.md) | [服务商](docs/zh/providers.md) |
 | Gateway config | [configuration](docs/ru/configuration.md) | [configuration](docs/en/configuration.md) | [配置](docs/zh/configuration.md) |
 | Troubleshooting | [troubleshooting](docs/ru/troubleshooting.md) | [troubleshooting](docs/en/troubleshooting.md) | [故障排查](docs/zh/troubleshooting.md) |
+| Support | [поддержать](docs/ru/support.md) | [support](docs/en/support.md) | [支持](docs/zh/support.md) |
+
+## Поддержать автора · Support the author · 支持作者
+
+If the project helped you, you can support the author with **USDT**.
+Отправляйте **только USDT в указанной сети**. 请**只在指定网络上发送 USDT**.
+Wrong network or token can cause permanent loss.
+
+| Network | Address |
+|---|---|
+| TON | `UQDi2mkFf1e0-YCwTA14bXb03rNzruouqS5xnQCG4QluLlJD` |
+| Tron (TRC20) | `TRbCHiNGECmkdzRqs7Hz5684PuEwNMstK2` |
+| Ethereum (ERC20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
+| Solana | `FPiVkxdNqJENgmF3Qib8wQR6oewYjwzZjSBBLtfMY6UH` |
+| BNB Smart Chain (BEP20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
+
+Details and warnings: [RU](docs/ru/support.md) · [EN](docs/en/support.md) · [中文](docs/zh/support.md).
 
 ## License
 

@@ -191,6 +191,7 @@ $env:GATEWAY_PROVIDER = 'alibaba'
 - [配置](docs/zh/configuration.md) — 网关、路由、计价、日志、预算、环境变量。
 - [故障排查](docs/zh/troubleshooting.md) — 401/404/429、模型、Desktop、端口、
   Node.js、UAC。
+- [支持作者](docs/zh/support.md) — USDT 地址和注意事项。
 
 English: [`docs/en`](docs/en) · Русский: [`docs/ru`](docs/ru).
 
@@ -233,6 +234,22 @@ MITM 是机器级修改：网关停止时，本机无法访问 `api.anthropic.co
 - 各服务商对图片和 PDF 的支持不同。请查看日志中的 `notes` 和响应头
   `x-gateway-route`。
 - Claude Desktop 和 MITM 属于实验功能。不了解后果时不要在工作机器上使用。
+
+## 支持作者
+
+本项目是教学用非商业项目。如果它对你有帮助，可以通过 **USDT** 支持作者。
+请**只在指定网络上发送 USDT**：选错网络可能导致资金永久丢失。
+
+| 网络 | 地址 |
+|---|---|
+| TON | `UQDi2mkFf1e0-YCwTA14bXb03rNzruouqS5xnQCG4QluLlJD` |
+| Tron (TRC20) | `TRbCHiNGECmkdzRqs7Hz5684PuEwNMstK2` |
+| Ethereum (ERC20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
+| Solana | `FPiVkxdNqJENgmF3Qib8wQR6oewYjwzZjSBBLtfMY6UH` |
+| BNB Smart Chain (BEP20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
+
+转账前请核对地址和网络，第一次先发送小额测试。捐赠完全自愿，不构成任何权利、
+担保或义务。详情：[docs/zh/support.md](docs/zh/support.md)。
 
 ## 许可证
 

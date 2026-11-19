@@ -203,6 +203,7 @@ $env:GATEWAY_PROVIDER = 'alibaba'
   бюджеты, переменные окружения.
 - [Диагностика](docs/ru/troubleshooting.md) — ошибки 401/404/429, модели,
   Desktop, порт, Node.js, UAC.
+- [Поддержать автора](docs/ru/support.md) — USDT-адреса и предупреждения.
 
 English: [`docs/en`](docs/en) · 中文: [`docs/zh`](docs/zh).
 
@@ -250,6 +251,24 @@ MITM — машинно-глобальное изменение: пока шлю
   `x-gateway-route` в ответе.
 - Claude Desktop и MITM — экспериментальная часть. Не используйте на рабочих
   машинах без понимания последствий.
+
+## Поддержать автора
+
+Проект учебный и некоммерческий. Если он оказался полезен, можно поддержать
+автора переводом **USDT**. Отправляйте **только USDT в указанной сети**:
+перевод в другой сети может привести к безвозвратной потере средств.
+
+| Сеть | Адрес |
+|---|---|
+| TON | `UQDi2mkFf1e0-YCwTA14bXb03rNzruouqS5xnQCG4QluLlJD` |
+| Tron (TRC20) | `TRbCHiNGECmkdzRqs7Hz5684PuEwNMstK2` |
+| Ethereum (ERC20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
+| Solana | `FPiVkxdNqJENgmF3Qib8wQR6oewYjwzZjSBBLtfMY6UH` |
+| BNB Smart Chain (BEP20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
+
+Перед переводом проверьте адрес и сеть; для первой проверки отправьте небольшую
+сумму. Донаты добровольные и не дают прав, гарантий или обязательств.
+Подробнее: [docs/ru/support.md](docs/ru/support.md).
 
 ## Лицензия
 

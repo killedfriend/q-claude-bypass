@@ -205,6 +205,7 @@ stored in the repository.
   budgets, environment variables.
 - [Troubleshooting](docs/en/troubleshooting.md) — 401/404/429, models, Desktop,
   port, Node.js, UAC.
+- [Support the author](docs/en/support.md) — USDT addresses and warnings.
 
 Русский: [`docs/ru`](docs/ru) · 中文: [`docs/zh`](docs/zh).
 
@@ -252,6 +253,24 @@ section before using MITM. Manual rollback:
   the log and `x-gateway-route` in the response.
 - Claude Desktop and MITM are experimental. Do not use them on a work machine
   without understanding the consequences.
+
+## Support the author
+
+This is an educational, non-commercial project. If it helped you, you can
+support the author with **USDT**. Send **only USDT on the specified network**:
+a transfer on the wrong network can cause permanent loss of funds.
+
+| Network | Address |
+|---|---|
+| TON | `UQDi2mkFf1e0-YCwTA14bXb03rNzruouqS5xnQCG4QluLlJD` |
+| Tron (TRC20) | `TRbCHiNGECmkdzRqs7Hz5684PuEwNMstK2` |
+| Ethereum (ERC20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
+| Solana | `FPiVkxdNqJENgmF3Qib8wQR6oewYjwzZjSBBLtfMY6UH` |
+| BNB Smart Chain (BEP20) | `0x5e88d21844F45A18DFA0B687ab96f2e98FeD5303` |
+
+Verify the address and network before sending; use a small test amount first.
+Donations are voluntary and do not grant rights, warranties or obligations.
+Details: [docs/en/support.md](docs/en/support.md).
 
 ## License
 
