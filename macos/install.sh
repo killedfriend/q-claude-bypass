@@ -120,7 +120,14 @@ fi
 # ---------------------------------------------------------------- stop old
 echo "==> Stopping old gateway"
 launchctl bootout "gui/$(id -u)/com.qclaude.gateway" >/dev/null 2>&1 || true
-pkill -f "$INSTALL_DIR/gateway/server.mjs" >/dev/null 2>&1 || true
+OLD_PID=""
+if [ -f "$INSTALL_DIR/gateway/logs/gateway.pid" ]; then
+  OLD_PID="$(cat "$INSTALL_DIR/gateway/logs/gateway.pid" 2>/dev/null || true)"
+fi
+if [ -z "$OLD_PID" ] && command -v lsof >/dev/null 2>&1; then
+  OLD_PID="$(lsof -tiTCP:8788 -sTCP:LISTEN 2>/dev/null || true)"
+fi
+if [ -n "$OLD_PID" ]; then kill $OLD_PID >/dev/null 2>&1 || true; fi
 
 mkdir -p "$INSTALL_DIR" "$INSTALL_DIR/gateway/logs" "$INSTALL_DIR/bin"
 

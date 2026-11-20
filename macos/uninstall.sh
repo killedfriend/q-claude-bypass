@@ -34,7 +34,16 @@ echo "QClaude Code uninstaller (macOS)"
 echo "==> LaunchAgent"
 launchctl bootout "gui/$(id -u)/com.qclaude.gateway" >/dev/null 2>&1 || true
 rm -f "$HOME/Library/LaunchAgents/com.qclaude.gateway.plist"
-pkill -f "$INSTALL_DIR/gateway/server.mjs" >/dev/null 2>&1 || true
+GATEWAY_PID=""
+if [ -f "$INSTALL_DIR/gateway/logs/gateway.pid" ]; then
+  GATEWAY_PID="$(cat "$INSTALL_DIR/gateway/logs/gateway.pid" 2>/dev/null || true)"
+fi
+if [ -z "$GATEWAY_PID" ] && command -v lsof >/dev/null 2>&1; then
+  GATEWAY_PID="$(lsof -tiTCP:8788 -sTCP:LISTEN 2>/dev/null || true)"
+fi
+if [ -n "$GATEWAY_PID" ]; then
+  kill $GATEWAY_PID >/dev/null 2>&1 || true
+fi
 echo "    removed"
 
 # 2. MITM

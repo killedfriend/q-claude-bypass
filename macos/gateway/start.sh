@@ -22,17 +22,23 @@ LABEL="com.qclaude.gateway"
 UID_NUM="$(id -u)"
 
 stop_gateway() {
-  local pids
-  pids="$(pgrep -f "$QCLAUDE_HOME/gateway/server.mjs" || true)"
+  local pids pidfile
+  pidfile="$GATEWAY_DIR/logs/gateway.pid"
+  pids=""
+  if [ -f "$pidfile" ]; then
+    pids="$(cat "$pidfile" 2>/dev/null || true)"
+  fi
+  if [ -z "$pids" ] && command -v lsof >/dev/null 2>&1; then
+    pids="$(lsof -tiTCP:"$PORT" -sTCP:LISTEN 2>/dev/null || true)"
+  fi
   if [ -n "$pids" ]; then
     # SIGTERM lets the gateway close the pid file cleanly.
     kill $pids 2>/dev/null || true
     for _ in $(seq 1 20); do
       sleep 0.25
-      pgrep -f "$QCLAUDE_HOME/gateway/server.mjs" >/dev/null 2>&1 || break
+      if ! kill -0 $pids 2>/dev/null; then break; fi
     done
-    pids="$(pgrep -f "$QCLAUDE_HOME/gateway/server.mjs" || true)"
-    if [ -n "$pids" ]; then kill -9 $pids 2>/dev/null || true; fi
+    if kill -0 $pids 2>/dev/null; then kill -9 $pids 2>/dev/null || true; fi
     echo "stopped gateway"
   else
     echo "gateway is not running"
@@ -46,7 +52,8 @@ case "${1:-}" in
   --background)
     mkdir -p "$GATEWAY_DIR/logs"
     if launchctl print "gui/$UID_NUM/$LABEL" >/dev/null 2>&1; then
-      launchctl kickstart -k "gui/$UID_NUM/$LABEL"
+      launchctl kickstart -k "gui/$UID_NUM/$LABEL" >/dev/null 2>&1 || \
+        nohup "$GATEWAY_DIR/run.sh" >>"$GATEWAY_DIR/logs/out.log" 2>>"$GATEWAY_DIR/logs/err.log" &
     else
       nohup "$GATEWAY_DIR/run.sh" >>"$GATEWAY_DIR/logs/out.log" 2>>"$GATEWAY_DIR/logs/err.log" &
     fi
