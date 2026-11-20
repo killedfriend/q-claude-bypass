@@ -200,6 +200,9 @@ if [ -f "$INSTALL_DIR/env" ]; then
   eval "KEY=\${$KEY_ENV:-}"
 fi
 if [ -z "$KEY" ]; then
+  eval "KEY=\${$KEY_ENV:-}"
+fi
+if [ -z "$KEY" ]; then
   echo "==> API key"
   echo "    create one: $(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).docs)' "$PROVIDER_FILE")"
   read -r -s -p "    Paste API key (hidden): " KEY
