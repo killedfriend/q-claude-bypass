@@ -29,6 +29,7 @@
 | `GATEWAY_DUMP` | `1` — записывать полный запрос наверх |
 | `GATEWAY_TLS_PFX`, `GATEWAY_TLS_PASSPHRASE` | TLS-слушатель для MITM на Windows |
 | `GATEWAY_TLS_CERT`, `GATEWAY_TLS_KEY` | TLS-слушатель из PEM |
+| `GATEWAY_TLS_PORT` | Порт TLS; на macOS используется 8443 за pfctl redirect |
 
 ## Общий конфиг
 

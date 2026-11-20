@@ -45,6 +45,19 @@ automatic Claude Desktop MITM (UAC required), logon autostart, and verifies the
 selected provider key. Use `-NoMitm` on a downloaded `install.ps1` to skip the
 hosts/certificate changes.
 
+## macOS (MVP)
+
+Download `QClaudeCode-<version>-macos.zip` from
+[Releases](https://github.com/killedfriend/q-claude-bypass/releases), unzip it,
+right-click `install.command` → **Open**. The installer configures the gateway,
+LaunchAgent autostart, and optional Claude Desktop MITM with `pfctl` redirect
+`443 → 8443`.
+
+The macOS build is an MVP: scripts are checked on a macOS CI runner, but live
+Claude Desktop GUI and certificate trust still need a real Mac test. The `.pkg`
+is unsigned. Details: [RU](docs/ru/macos.md) · [EN](docs/en/macos.md) ·
+[中文](docs/zh/macos.md).
+
 ## Providers
 
 | Provider | Base URL | Key variable |
@@ -66,6 +79,7 @@ Homyak API принимает карты РФ, СБП, MirPay и SberPay — п�
 | Providers | [providers](docs/ru/providers.md) | [providers](docs/en/providers.md) | [服务商](docs/zh/providers.md) |
 | Gateway config | [configuration](docs/ru/configuration.md) | [configuration](docs/en/configuration.md) | [配置](docs/zh/configuration.md) |
 | Troubleshooting | [troubleshooting](docs/ru/troubleshooting.md) | [troubleshooting](docs/en/troubleshooting.md) | [故障排查](docs/zh/troubleshooting.md) |
+| macOS | [macOS](docs/ru/macos.md) | [macOS](docs/en/macos.md) | [macOS](docs/zh/macos.md) |
 | Support | [поддержать](docs/ru/support.md) | [support](docs/en/support.md) | [支持](docs/zh/support.md) |
 
 ## Поддержать автора · Support the author · 支持作者

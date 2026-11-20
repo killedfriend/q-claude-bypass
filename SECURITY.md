@@ -44,6 +44,23 @@ additional authentication, and do not enable dumps on sensitive data.
 - The MITM helper creates a local CA and a certificate private key. Treat the
   PFX as a secret and remove it with `desktop/mitm/teardown-mitm.ps1`.
 
+## macOS MITM
+
+The macOS installer can configure the same interception with OpenSSL, the
+System keychain and `pfctl`:
+
+- local CA `CN=QClaude Local CA` and a leaf certificate for
+  `api.anthropic.com`;
+- `/etc/hosts` entry `127.0.0.1 api.anthropic.com`;
+- `/etc/pf.anchors/com.qclaude` plus references in `/etc/pf.conf`;
+- pf redirect `443 → 8443` and a root LaunchDaemon `com.qclaude.pf` to restore
+  it at boot;
+- gateway TLS listener on `127.0.0.1:8443` running as the desktop user.
+
+This modifies machine-wide network rules and the System keychain. Use
+`--no-mitm` to skip it, and `macos/uninstall.sh` to remove it. The macOS flow is
+an MVP and has not been validated in a live Claude Desktop GUI.
+
 ## Automatic MITM
 
 The Windows installer enables a local MITM for Claude Desktop by default:

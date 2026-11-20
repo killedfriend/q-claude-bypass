@@ -25,6 +25,23 @@ jobs:
       - name: Unit and integration tests
         run: npm test
 
+  macos:
+    name: macOS scripts and build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Bash syntax
+        run: |
+          find macos scripts -type f \( -name '*.sh' -o -name 'install.command' \) -print0 \
+            | xargs -0 -n1 bash -n
+      - name: Unit and integration tests
+        run: npm test
+      - name: Build macOS artifacts
+        run: bash scripts/build-macos.sh
+
   validate:
     name: Scripts and JSON
     runs-on: windows-latest

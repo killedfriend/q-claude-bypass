@@ -41,6 +41,8 @@ QClaude Code запускает настоящий Claude Code и Claude Desktop
   чтобы длинные сессии не пересылали сотни тысяч токенов каждый ход.
 - **Установщик для Windows.** Одна команда: Node.js, Claude Code, Claude
   Desktop, шлюз, автоматический MITM для Desktop, автозапуск и проверка ключа.
+- **macOS MVP.** ZIP/PKG, LaunchAgent, MITM через `openssl` + `security` +
+  `pfctl` redirect `443 → 8443`.
 - **Документация на трёх языках** и примеры настроек для каждого провайдера.
 
 ## Как это работает
@@ -154,6 +156,18 @@ Get-Content "$env:LOCALAPPDATA\QClaudeCode\gateway\logs\requests.jsonl" -Tail 5
 irm https://github.com/killedfriend/q-claude-bypass/releases/latest/download/uninstall.ps1 | iex
 ```
 
+## macOS (MVP)
+
+Скачайте `QClaudeCode-<version>-macos.zip` из
+[Releases](https://github.com/killedfriend/q-claude-bypass/releases),
+распакуйте и откройте `install.command` через правый клик → **Open**.
+Установщик настроит gateway, автозапуск через LaunchAgent и, по желанию, MITM
+для Claude Desktop с `pfctl` redirect `443 → 8443`.
+
+Это MVP: скрипты проверяются на macOS CI, но живой Claude Desktop GUI и доверие
+сертификату ещё нужно проверить на реальном Mac. `.pkg` не подписан.
+Подробно: [docs/ru/macos.md](docs/ru/macos.md).
+
 ## Ручной запуск из репозитория
 
 ```powershell
@@ -199,6 +213,7 @@ $env:GATEWAY_PROVIDER = 'alibaba'
 | `gateway/lib/*.mjs` | Конфиг, цены, маршрутизация, обрезка контекста |
 | `desktop/` | Экспериментальная привязка Claude Desktop (политики, MITM) |
 | `examples/claude-settings/` | Примеры `~/.claude/settings.json` для прямого режима |
+| `macos/` | macOS-установщик, launchers, LaunchAgent, MITM и pf |
 | `docs/ru`, `docs/en`, `docs/zh` | Подробная документация |
 | `scripts/build-release.ps1` | Сборка ZIP и артефактов релиза |
 
@@ -212,6 +227,7 @@ $env:GATEWAY_PROVIDER = 'alibaba'
   бюджеты, переменные окружения.
 - [Диагностика](docs/ru/troubleshooting.md) — ошибки 401/404/429, модели,
   Desktop, порт, Node.js, UAC.
+- [macOS](docs/ru/macos.md) — ZIP/PKG, LaunchAgent, MITM и `pfctl`.
 - [Поддержать автора](docs/ru/support.md) — USDT-адреса, CloudTips и предупреждения.
 
 English: [`docs/en`](docs/en) · 中文: [`docs/zh`](docs/zh).

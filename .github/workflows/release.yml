@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   release:
-    name: Build and publish
+    name: Build Windows assets
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,3 +50,31 @@ jobs:
             ```
 
             See README.ru.md, README.en.md and README.zh-CN.md.
+
+            macOS assets are built on the macOS runner: use the `.zip` package or
+            the unsigned `.pkg`; see docs/*/macos.md.
+
+  release-macos:
+    name: Build macOS assets
+    needs: release
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Tests
+        run: npm test
+      - name: Build macOS artifacts
+        run: bash scripts/build-macos.sh
+      - name: Upload macOS assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "$GITHUB_REF_NAME" \
+            dist/macos/*.zip \
+            dist/macos/*.pkg \
+            dist/macos/SHA256SUMS-macos.txt \
+            --clobber

@@ -32,6 +32,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const CFG = loadConfig({ gatewayDir: HERE, env: process.env });
 const HOST = CFG.listen.host;
 const PORT = Number(CFG.listen.port);
+const TLS_PORT = Number(process.env.GATEWAY_TLS_PORT || 443);
 const LOG = resolve(CFG.dir, CFG.logFile);
 const RETRYABLE = new Set([408, 429, 500, 502, 503, 504]);
 const STARTED = Date.now();
@@ -676,8 +677,8 @@ if (TLS_OPTS) {
     tlsServer.requestTimeout = 0;
     tlsServer.headersTimeout = 0;
     tlsServer.on('tlsClientError', (e) => console.error('TLS client error:', e.message));
-    tlsServer.listen(443, '127.0.0.1', () => {
-      console.log('TLS      https://api.anthropic.com:443');
+    tlsServer.listen(TLS_PORT, '127.0.0.1', () => {
+      console.log('TLS      https://api.anthropic.com:%d', TLS_PORT);
     });
   } catch (e) {
     console.error('TLS listener failed:', e.message);

@@ -41,6 +41,8 @@ non-Anthropic backend without forking Claude Code or patching its binaries?
   resending hundreds of thousands of tokens every turn.
 - **Windows installer.** One command: Node.js, Claude Code, Claude Desktop,
   gateway, automatic Desktop MITM, autostart, and a key smoke test.
+- **macOS MVP.** ZIP/PKG, LaunchAgent, MITM via `openssl` + `security` +
+  `pfctl` redirect `443 → 8443`.
 - **Documentation in three languages** and settings examples for every
   provider.
 
@@ -157,6 +159,18 @@ Uninstall:
 irm https://github.com/killedfriend/q-claude-bypass/releases/latest/download/uninstall.ps1 | iex
 ```
 
+## macOS (MVP)
+
+Download `QClaudeCode-<version>-macos.zip` from
+[Releases](https://github.com/killedfriend/q-claude-bypass/releases), unzip it,
+and right-click `install.command` → **Open**. The installer configures the
+gateway, LaunchAgent autostart, and optional Claude Desktop MITM with `pfctl`
+redirect `443 → 8443`.
+
+This is an MVP: scripts are checked on macOS CI, but the live Claude Desktop GUI
+and certificate trust still need a real Mac test. The `.pkg` is unsigned.
+Details: [docs/en/macos.md](docs/en/macos.md).
+
 ## Manual use from the repository
 
 ```powershell
@@ -202,6 +216,7 @@ The key lives in a user environment variable (`DEEPSEEK_API_KEY`,
 | `gateway/lib/*.mjs` | Config, pricing, routing, context pruning |
 | `desktop/` | Experimental Claude Desktop pinning (policy, MITM) |
 | `examples/claude-settings/` | Direct-mode `~/.claude/settings.json` examples |
+| `macos/` | macOS installer, launchers, LaunchAgent, MITM and pf |
 | `docs/en`, `docs/ru`, `docs/zh` | Full documentation |
 | `scripts/build-release.ps1` | Builds the release ZIP and assets |
 
@@ -215,6 +230,7 @@ The key lives in a user environment variable (`DEEPSEEK_API_KEY`,
   budgets, environment variables.
 - [Troubleshooting](docs/en/troubleshooting.md) — 401/404/429, models, Desktop,
   port, Node.js, UAC.
+- [macOS](docs/en/macos.md) — ZIP/PKG, LaunchAgent, MITM and `pfctl`.
 - [Support the author](docs/en/support.md) — USDT addresses, CloudTips and warnings.
 
 Русский: [`docs/ru`](docs/ru) · 中文: [`docs/zh`](docs/zh).

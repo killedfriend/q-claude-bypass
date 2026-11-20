@@ -35,6 +35,8 @@ Claude Desktop 使用第三方模型。客户端与模型服务之间有一个�
   Token。
 - **Windows 安装器。** 一条命令完成 Node.js、Claude Code、Claude Desktop、
   网关、Desktop 自动 MITM、开机自启和密钥检查。
+- **macOS MVP。** ZIP/PKG、LaunchAgent、通过 `openssl` + `security` +
+  `pfctl` 443 → 8443 重定向实现 MITM。
 - **三语文档**以及每个服务商的配置示例。
 
 ## 工作原理
@@ -144,6 +146,16 @@ Get-Content "$env:LOCALAPPDATA\QClaudeCode\gateway\logs\requests.jsonl" -Tail 5
 irm https://github.com/killedfriend/q-claude-bypass/releases/latest/download/uninstall.ps1 | iex
 ```
 
+## macOS（MVP）
+
+从 [Releases](https://github.com/killedfriend/q-claude-bypass/releases) 下载
+`QClaudeCode-<version>-macos.zip`，解压后右键 `install.command` → **打开**。
+安装器会配置网关、LaunchAgent 自启，以及可选的 Claude Desktop MITM：
+`pfctl` 将 `443` 重定向到 `8443`。
+
+这是 MVP：脚本会在 macOS CI 中检查，但真实 Mac 上的 Claude Desktop GUI 和
+证书信任仍需验证。`.pkg` 未签名。详情：[docs/zh/macos.md](docs/zh/macos.md)。
+
 ## 从仓库手动运行
 
 ```powershell
@@ -189,6 +201,7 @@ $env:GATEWAY_PROVIDER = 'alibaba'
 | `gateway/lib/*.mjs` | 配置、计价、路由、上下文裁剪 |
 | `desktop/` | 实验性的 Claude Desktop 绑定（策略、MITM） |
 | `examples/claude-settings/` | 直连模式的 `~/.claude/settings.json` 示例 |
+| `macos/` | macOS 安装器、启动器、LaunchAgent、MITM 和 pf |
 | `docs/zh`、`docs/en`、`docs/ru` | 完整文档 |
 | `scripts/build-release.ps1` | 构建发布 ZIP 和产物 |
 
@@ -200,6 +213,7 @@ $env:GATEWAY_PROVIDER = 'alibaba'
 - [配置](docs/zh/configuration.md) — 网关、路由、计价、日志、预算、环境变量。
 - [故障排查](docs/zh/troubleshooting.md) — 401/404/429、模型、Desktop、端口、
   Node.js、UAC。
+- [macOS](docs/zh/macos.md) — ZIP/PKG、LaunchAgent、MITM 和 `pfctl`。
 - [支持作者](docs/zh/support.md) — USDT 地址、CloudTips 和注意事项。
 
 English: [`docs/en`](docs/en) · Русский: [`docs/ru`](docs/ru).

@@ -28,6 +28,7 @@
 | `GATEWAY_DUMP` | `1` 时写入完整上游请求 |
 | `GATEWAY_TLS_PFX`、`GATEWAY_TLS_PASSPHRASE` | Windows Desktop MITM 的 TLS 监听 |
 | `GATEWAY_TLS_CERT`、`GATEWAY_TLS_KEY` | PEM TLS 监听 |
+| `GATEWAY_TLS_PORT` | TLS 端口；macOS 在 pfctl 重定向后使用 8443 |
 
 ## 公共配置
 

@@ -8,6 +8,14 @@ gateway/logs/
 gateway/providers/*.local.json
 install.json
 
+# generated macOS MITM material
+desktop/mitm/*.key
+desktop/mitm/*.crt
+desktop/mitm/*.csr
+desktop/mitm/*.srl
+desktop/mitm/hosts.backup
+desktop/mitm/*.cnf
+
 # generated test/parity output
 tests/parity/hook-input.jsonl
 tests/parity/hook-fired.txt

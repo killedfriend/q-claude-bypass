@@ -3,6 +3,18 @@
 All notable changes are documented here. The project is educational and
 non-commercial; compatibility is best-effort.
 
+## 1.1.0 — 2026-11-20
+
+- Added macOS MVP support:
+  - `macos/install.sh`, `uninstall.sh`, `qclaude`, `qclaude-gw`;
+  - LaunchAgent `com.qclaude.gateway`;
+  - OpenSSL CA/leaf + System keychain trust + `/etc/hosts`;
+  - `pfctl` redirect `443 → 8443` and a boot LaunchDaemon;
+  - `.zip` and unsigned `.pkg` build via `scripts/build-macos.sh`;
+  - macOS CI job and release assets;
+  - RU/EN/ZH macOS documentation.
+- Added `GATEWAY_TLS_PORT` so the gateway can listen on 8443 on macOS.
+
 ## 1.0.6 — 2026-11-20
 
 - Added the Homyak API provider (`homyakstudio.ru`): an Anthropic-compatible

@@ -34,7 +34,9 @@ foreach ($path in @(
     'README.ru.md', 'README.en.md', 'README.zh-CN.md',
     'docs/ru/installation.md', 'docs/ru/providers.md', 'docs/ru/configuration.md', 'docs/ru/troubleshooting.md',
     'docs/en/installation.md', 'docs/en/providers.md', 'docs/en/configuration.md', 'docs/en/troubleshooting.md',
-    'docs/zh/installation.md', 'docs/zh/providers.md', 'docs/zh/configuration.md', 'docs/zh/troubleshooting.md'
+    'docs/zh/installation.md', 'docs/zh/providers.md', 'docs/zh/configuration.md', 'docs/zh/troubleshooting.md',
+    'docs/ru/macos.md', 'docs/en/macos.md', 'docs/zh/macos.md',
+    'macos/install.sh', 'macos/uninstall.sh', 'macos/mitm/setup.sh'
 )) {
     if (-not (Test-Path (Join-Path $root $path))) { $problems += "missing doc: $path" }
 }

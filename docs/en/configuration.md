@@ -28,6 +28,7 @@ Environment overrides:
 | `GATEWAY_DUMP` | `1` writes the full upstream request |
 | `GATEWAY_TLS_PFX`, `GATEWAY_TLS_PASSPHRASE` | Windows TLS listener for Desktop MITM |
 | `GATEWAY_TLS_CERT`, `GATEWAY_TLS_KEY` | PEM TLS listener |
+| `GATEWAY_TLS_PORT` | TLS listen port; macOS uses 8443 behind pfctl redirect |
 
 ## Shared config
 

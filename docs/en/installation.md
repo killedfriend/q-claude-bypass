@@ -267,4 +267,5 @@ with `-ConfigureDesktop`, and CC Switch is a third-party alternative. See
 - [Providers](providers.md)
 - [Configuration](configuration.md)
 - [Troubleshooting](troubleshooting.md)
+- [macOS](macos.md)
 - [Support the author](support.md)
