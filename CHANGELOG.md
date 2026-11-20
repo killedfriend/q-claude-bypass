@@ -3,6 +3,11 @@
 All notable changes are documented here. The project is educational and
 non-commercial; compatibility is best-effort.
 
+## 1.1.1 — 2026-11-20
+
+- macOS gateway stop now uses the gateway PID file and `lsof` on port 8788
+  instead of a relative `pgrep` pattern.
+
 ## 1.1.0 — 2026-11-20
 
 - Added macOS MVP support:
