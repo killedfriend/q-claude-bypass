@@ -10,7 +10,9 @@
 - Windows 10 или 11 (x64).
 - PowerShell 5.1 или новее.
 - Доступ в интернет к GitHub, npm, nodejs.org и вашему провайдеру.
-- API-ключ DeepSeek, Tencent Cloud, Alibaba Cloud Model Studio или OpenRouter.
+- API-ключ DeepSeek, Tencent Cloud, Alibaba Cloud Model Studio, OpenRouter или
+  [Хомяк API](https://homyakstudio.ru/?utm_source=github). У Хомяк API оплата
+  картой РФ, СБП, MirPay и SberPay — иностранная карта не нужна.
 - Желательно `winget` (App Installer) для Claude Desktop. Если его нет,
   установщик предложит ссылку для ручной установки.
 - Права администратора и подтверждение UAC для автоматического MITM Claude
@@ -35,7 +37,7 @@ powershell -ExecutionPolicy Bypass -Command "irm https://github.com/killedfriend
 
 Установщик спросит:
 
-1. провайдера (DeepSeek, Tencent, Alibaba, OpenRouter);
+1. провайдера (DeepSeek, Tencent, Alibaba, OpenRouter, Хомяк API);
 2. API-ключ (ввод скрыт).
 
 Ключ сохраняется в пользовательскую переменную окружения и не попадает в
@@ -69,7 +71,7 @@ PowerShell или в списке процессов. Лучше использ�
 
 | Параметр | Значение |
 |---|---|
-| `-Provider` | `deepseek`, `tencent`, `alibaba`, `openrouter` |
+| `-Provider` | `deepseek`, `tencent`, `alibaba`, `openrouter`, `homyak` |
 | `-ApiKey` | API-ключ; если не указан, установщик спросит |
 | `-InstallDir` | Каталог установки, по умолчанию `%LOCALAPPDATA%\QClaudeCode` |
 | `-ClaudeHome` | Каталог настроек Claude, по умолчанию `%USERPROFILE%\.claude` |

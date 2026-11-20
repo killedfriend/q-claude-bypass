@@ -10,8 +10,9 @@
 - Windows 10 or 11 (x64).
 - PowerShell 5.1 or newer.
 - Internet access to GitHub, npm, nodejs.org and your provider.
-- An API key from DeepSeek, Tencent Cloud, Alibaba Cloud Model Studio, or
-  OpenRouter.
+- An API key from DeepSeek, Tencent Cloud, Alibaba Cloud Model Studio,
+  OpenRouter, or Homyak API (Russia only; RUB billing, Russian card, SBP,
+  MirPay and SberPay accepted).
 - Optional: `winget` (App Installer) for Claude Desktop. The installer falls
   back to a manual link if it is missing.
 - Administrator rights and UAC approval for the default Claude Desktop MITM
@@ -36,7 +37,7 @@ powershell -ExecutionPolicy Bypass -Command "irm https://github.com/killedfriend
 
 The installer asks for:
 
-1. the provider (DeepSeek, Tencent, Alibaba, OpenRouter);
+1. the provider (DeepSeek, Tencent, Alibaba, OpenRouter, Homyak API);
 2. the API key (hidden input).
 
 The key is saved as a user environment variable and is never written to the
@@ -70,7 +71,7 @@ Run the script from a downloaded file to pass parameters:
 
 | Option | Meaning |
 |---|---|
-| `-Provider` | `deepseek`, `tencent`, `alibaba`, `openrouter` |
+| `-Provider` | `deepseek`, `tencent`, `alibaba`, `openrouter`, `homyak` |
 | `-ApiKey` | API key; if omitted, the installer prompts |
 | `-InstallDir` | Install directory, default `%LOCALAPPDATA%\QClaudeCode` |
 | `-ClaudeHome` | Claude settings directory, default `%USERPROFILE%\.claude` |

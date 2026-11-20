@@ -3,7 +3,7 @@
 > **教学用非商业项目。** 文中服务商名称和端点仅用于说明兼容性。本项目与它们
 > 无关联。使用前请确认最新文档、价格和条款。
 
-四个预设都使用 Anthropic 兼容端点。网关会统一模型名、认证方式和不支持的
+五个预设都使用 Anthropic 兼容端点。网关会统一模型名、认证方式和不支持的
 请求块，因此 Claude Code 始终看到 `claude-*` 公共模型名。
 
 ## 概览
@@ -14,11 +14,12 @@
 | 腾讯混元 | `gateway/providers/tencent.json` | `https://api.hunyuan.cloud.tencent.com/anthropic` | `x-api-key` + `TENCENT_API_KEY` | `hunyuan-2.0-instruct-20251111` |
 | 阿里云百炼 | `gateway/providers/alibaba.json` | `https://dashscope.aliyuncs.com/apps/anthropic` | `Authorization: Bearer` + `DASHSCOPE_API_KEY` | `qwen3.7-plus` |
 | OpenRouter | `gateway/providers/openrouter.json` | `https://openrouter.ai/api` | `Authorization: Bearer` + `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4.5` |
+| Homyak API（仅限俄罗斯） | `gateway/providers/homyak.json` | `https://api.homyakstudio.ru` | `Authorization: Bearer` + `HOMYAK_API_KEY` | `homyak-flash` |
 
 模型 ID 只是示例，会随时间变化。
 
-> **验证状态。** DeepSeek 已在 2026-11-19 用真实请求验证。腾讯、阿里云和
-> OpenRouter 预设基于官方文档编写，未在本仓库中做真实请求验证。请核对账户
+> **验证状态。** DeepSeek 已在 2026-11-19 用真实请求验证。腾讯、阿里云、
+> OpenRouter 和 Homyak API 预设基于官方文档编写，未在本仓库中做真实请求验证。请核对账户
 > 支持的模型 ID、端点和认证头。
 
 ## DeepSeek
@@ -176,6 +177,47 @@ Claude Code 会在 `ANTHROPIC_BASE_URL` 后追加 `/v1/messages`，因此 Base U
 OpenRouter 在响应中返回 `usage.cost`。网关保存精确值，而不是按价格表估算；
 价格表只作为后备。
 
+## Homyak API（仅限俄罗斯）
+
+面向俄罗斯用户的 DeepSeek 转售服务，提供 Anthropic 兼容端点。余额和计费
+均以卢布结算，支持本地支付方式，无需境外银行卡。
+
+- 注册、充值和创建密钥：<https://homyakstudio.ru/?utm_source=github>。
+- 支付：俄罗斯银行卡、SBP、MirPay 和 SberPay，500 ₽ 起；企业可申请账单
+  （1 000 ₽ 起）。
+- Anthropic Base URL：`https://api.homyakstudio.ru`（Claude Code 会自动追加
+  `/v1/messages`）。
+- `sk-hmk-…` 密钥通过 `Authorization: Bearer` 发送。
+
+只有一个模型 `homyak-flash`（DeepSeek V4.1 Flash）：1M 上下文、384K 输出、
+图像、工具。价格为每 1M Token 的卢布价：
+
+| 时段 | 输入 | 缓存 | 输出 |
+|---|---|---|---|
+| 峰时（北京时间工作日 09:00–12:00、14:00–18:00） | 39.00 ₽ | 0.78 ₽ | 156.00 ₽ |
+| 谷时 | 19.50 ₽ | 0.39 ₽ | 78.00 ₽ |
+
+直连设置：
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.homyakstudio.ru",
+    "ANTHROPIC_AUTH_TOKEN": "sk-hmk-...",
+    "ANTHROPIC_API_KEY": "",
+    "ANTHROPIC_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "homyak-flash",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "homyak-flash"
+  }
+}
+```
+
+网关预设中三个角色（`main`、`heavy`、`cheap`）都指向 `homyak-flash`，
+`currency` 为 `RUB`：`report.mjs` 和每日预算按峰谷价以卢布统计。不支持 PDF，
+网关会移除 `document` 块并把原因写入 `notes`。
+
 ## 切换服务商
 
 编辑 `gateway/config.json`：
@@ -245,20 +287,21 @@ $env:GATEWAY_PROVIDER = 'openrouter'
 - `examples/claude-settings/tencent.settings.json`
 - `examples/claude-settings/alibaba.settings.json`
 - `examples/claude-settings/openrouter.settings.json`
+- `examples/claude-settings/homyak.settings.json`
 
 这些是模板：替换 `<YOUR_..._KEY>`，把 `env` 块合并到现有的
 `~/.claude/settings.json`。不要覆盖其他设置。
 
 ## 兼容性
 
-| 功能 | DeepSeek | 腾讯 | 阿里云 | OpenRouter |
-|---|---|---|---|---|
-| 流式输出 | 是 | 是 | 是 | 是 |
-| 工具调用 | 是 | 是 | 是 | 是 |
-| 图片 | 仅 flash；网关会改路由 | 取决于模型 | 取决于模型 | 取决于模型 |
-| PDF | Files API | 不支持 | 不支持 | 原生支持 |
-| 服务端联网搜索 | 计费并记录 | 取决于模型 | 取决于模型 | 取决于模型 |
-| 响应中的精确费用 | 否 | 否 | 否 | 是（`usage.cost`） |
+| 功能 | DeepSeek | 腾讯 | 阿里云 | OpenRouter | Homyak API |
+|---|---|---|---|---|---|
+| 流式输出 | 是 | 是 | 是 | 是 | 是 |
+| 工具调用 | 是 | 是 | 是 | 是 | 是 |
+| 图片 | 仅 flash；网关会改路由 | 取决于模型 | 取决于模型 | 取决于模型 | 是 |
+| PDF | Files API | 不支持 | 不支持 | 原生支持 | 不支持 |
+| 服务端联网搜索 | 计费并记录 | 取决于模型 | 取决于模型 | 取决于模型 | 否 |
+| 响应中的精确费用 | 否 | 否 | 否 | 是（`usage.cost`） | 否 |
 
 服务商能力会变化。请求失败时查看
 `gateway/logs/requests.jsonl`、`notes` 字段和 `x-gateway-route`。

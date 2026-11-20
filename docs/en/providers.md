@@ -4,7 +4,7 @@
 > used only to describe interoperability. This project is not affiliated with
 > them. Check current documentation, pricing and terms before use.
 
-All four presets use an Anthropic-compatible endpoint. The gateway normalizes
+All five presets use an Anthropic-compatible endpoint. The gateway normalizes
 model names, authentication and unsupported blocks, so Claude Code always sees
 `claude-*` public model names.
 
@@ -16,12 +16,13 @@ model names, authentication and unsupported blocks, so Claude Code always sees
 | Tencent Hunyuan | `gateway/providers/tencent.json` | `https://api.hunyuan.cloud.tencent.com/anthropic` | `x-api-key` + `TENCENT_API_KEY` | `hunyuan-2.0-instruct-20251111` |
 | Alibaba Bailian | `gateway/providers/alibaba.json` | `https://dashscope.aliyuncs.com/apps/anthropic` | `Authorization: Bearer` + `DASHSCOPE_API_KEY` | `qwen3.7-plus` |
 | OpenRouter | `gateway/providers/openrouter.json` | `https://openrouter.ai/api` | `Authorization: Bearer` + `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4.5` |
+| Homyak API (Russia only) | `gateway/providers/homyak.json` | `https://api.homyakstudio.ru` | `Authorization: Bearer` + `HOMYAK_API_KEY` | `homyak-flash` |
 
 Model IDs are examples and change over time.
 
 > **Verification status.** DeepSeek was live-tested on 2026-11-19. Tencent,
-> Alibaba and OpenRouter presets are based on the providers' official
-> documentation and were not live-tested in this repository. Check the model
+> Alibaba, OpenRouter and Homyak API presets are based on the providers'
+> official documentation and were not live-tested in this repository. Check the model
 > IDs, endpoint and auth header for your account.
 
 ## DeepSeek
@@ -187,6 +188,50 @@ OpenRouter uses for attribution. Replace the example repository URL in
 OpenRouter returns `usage.cost` in the response. The gateway stores that exact
 value instead of estimating from the price table; the table is only a fallback.
 
+## Homyak API (Russia only)
+
+A Russian service with an Anthropic-compatible endpoint to DeepSeek. It is
+intended for users in Russia: the balance and billing are in RUB, and it
+accepts local payment methods, so no foreign card is needed.
+
+- Sign up, top up and create a key:
+  <https://homyakstudio.ru/?utm_source=github>.
+- Payment: Russian bank card, SBP, MirPay and SberPay; top-up from 500 ₽,
+  invoices for companies from 1 000 ₽.
+- Anthropic base URL: `https://api.homyakstudio.ru` (Claude Code appends
+  `/v1/messages`).
+- The `sk-hmk-…` key is sent as `Authorization: Bearer`.
+
+There is one model, `homyak-flash` (DeepSeek V4.1 Flash): 1M context, 384K
+output, images, tools. Prices in RUB per 1M tokens:
+
+| Tariff | Input | Cache | Output |
+|---|---|---|---|
+| Peak (weekdays 09:00–12:00 and 14:00–18:00 Beijing) | 39.00 ₽ | 0.78 ₽ | 156.00 ₽ |
+| Off-peak | 19.50 ₽ | 0.39 ₽ | 78.00 ₽ |
+
+Direct settings:
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.homyakstudio.ru",
+    "ANTHROPIC_AUTH_TOKEN": "sk-hmk-...",
+    "ANTHROPIC_API_KEY": "",
+    "ANTHROPIC_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "homyak-flash",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "homyak-flash"
+  }
+}
+```
+
+In the gateway preset all three roles (`main`, `heavy`, `cheap`) point at
+`homyak-flash`, and `currency` is `RUB`: `report.mjs` and the daily budget
+count in rubles at peak/off-peak rates. PDFs are not supported; the gateway
+strips `document` blocks and records the reason in `notes`.
+
 ## Switching providers
 
 Edit `gateway/config.json`:
@@ -258,20 +303,21 @@ Direct-mode settings for all providers:
 - `examples/claude-settings/tencent.settings.json`
 - `examples/claude-settings/alibaba.settings.json`
 - `examples/claude-settings/openrouter.settings.json`
+- `examples/claude-settings/homyak.settings.json`
 
 These are templates: replace `<YOUR_..._KEY>` and merge the `env` block into
 your existing `~/.claude/settings.json`. Do not overwrite unrelated settings.
 
 ## Compatibility notes
 
-| Feature | DeepSeek | Tencent | Alibaba | OpenRouter |
-|---|---|---|---|---|
-| Streaming | yes | yes | yes | yes |
-| Tools | yes | yes | yes | yes |
-| Images | flash only; gateway reroutes | provider-dependent | provider-dependent | model-dependent |
-| PDF | Files API | omitted | omitted | native |
-| Server-side web search | billed and logged | provider-dependent | provider-dependent | provider-dependent |
-| Exact cost from response | no | no | no | yes (`usage.cost`) |
+| Feature | DeepSeek | Tencent | Alibaba | OpenRouter | Homyak API |
+|---|---|---|---|---|---|
+| Streaming | yes | yes | yes | yes | yes |
+| Tools | yes | yes | yes | yes | yes |
+| Images | flash only; gateway reroutes | provider-dependent | provider-dependent | model-dependent | yes |
+| PDF | Files API | omitted | omitted | native | omitted |
+| Server-side web search | billed and logged | provider-dependent | provider-dependent | provider-dependent | no |
+| Exact cost from response | no | no | no | yes (`usage.cost`) | no |
 
 Provider features change. If a request fails, inspect
 `gateway/logs/requests.jsonl`, the `notes` field, and `x-gateway-route`.

@@ -21,8 +21,8 @@
 > 使用风险自负。
 
 A local Anthropic-compatible gateway that lets the real Claude Code and Claude
-Desktop run on DeepSeek, Tencent Hunyuan, Alibaba Qwen, or OpenRouter — with
-model routing, token/cost accounting, retries, and context pruning.
+Desktop run on DeepSeek, Tencent Hunyuan, Alibaba Qwen, OpenRouter, or Homyak
+API — with model routing, token/cost accounting, retries, and context pruning.
 
 ```text
 Claude Code -> http://127.0.0.1:8788 -> provider
@@ -53,6 +53,10 @@ hosts/certificate changes.
 | Tencent Hunyuan | `https://api.hunyuan.cloud.tencent.com/anthropic` | `TENCENT_API_KEY` |
 | Alibaba Bailian | `https://dashscope.aliyuncs.com/apps/anthropic` | `DASHSCOPE_API_KEY` |
 | OpenRouter | `https://openrouter.ai/api` | `OPENROUTER_API_KEY` |
+| Homyak API | `https://api.homyakstudio.ru` | `HOMYAK_API_KEY` |
+
+Homyak API принимает карты РФ, СБП, MirPay и SberPay — подробности в
+[русской инструкции](README.ru.md#провайдеры).
 
 ## Documentation
 

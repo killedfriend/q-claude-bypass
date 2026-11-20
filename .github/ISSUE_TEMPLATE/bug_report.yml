@@ -24,6 +24,7 @@ body:
         - Tencent Hunyuan
         - Alibaba Bailian
         - OpenRouter
+        - Homyak API (homyakstudio.ru)
         - Custom
         - Not provider-specific
     validations:

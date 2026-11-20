@@ -9,7 +9,8 @@
 - Windows 10 或 11（x64）。
 - PowerShell 5.1 或更高版本。
 - 可访问 GitHub、npm、nodejs.org 和所选用服务商。
-- DeepSeek、腾讯云、阿里云百炼或 OpenRouter 的 API 密钥。
+- DeepSeek、腾讯云、阿里云百炼、OpenRouter 的 API 密钥，或 Homyak API
+  （仅限俄罗斯：卢布计费，支持俄罗斯银行卡、SBP、MirPay 和 SberPay）。
 - 建议安装 `winget`（应用安装程序）。如果没有，安装器会给出 Claude Desktop
   的手动下载链接。
 - 默认 Claude Desktop MITM 需要管理员权限和 UAC 确认（hosts + 受信任根证书）。
@@ -33,7 +34,7 @@ powershell -ExecutionPolicy Bypass -Command "irm https://github.com/killedfriend
 
 安装器会询问：
 
-1. 服务商（DeepSeek、腾讯、阿里云、OpenRouter）；
+1. 服务商（DeepSeek、腾讯、阿里云、OpenRouter、Homyak API）；
 2. API 密钥（隐藏输入）。
 
 密钥会保存为用户环境变量，不会写入仓库。
@@ -66,7 +67,7 @@ irm https://github.com/killedfriend/q-claude-bypass/releases/latest/download/ins
 
 | 参数 | 含义 |
 |---|---|
-| `-Provider` | `deepseek`、`tencent`、`alibaba`、`openrouter` |
+| `-Provider` | `deepseek`、`tencent`、`alibaba`、`openrouter`、`homyak` |
 | `-ApiKey` | API 密钥；省略则交互输入 |
 | `-InstallDir` | 安装目录，默认 `%LOCALAPPDATA%\QClaudeCode` |
 | `-ClaudeHome` | Claude 设置目录，默认 `%USERPROFILE%\.claude` |

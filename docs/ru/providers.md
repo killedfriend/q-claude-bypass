@@ -4,7 +4,7 @@
 > используются только для описания совместимости. Проект с ними не связан.
 > Перед использованием проверьте актуальную документацию, тарифы и условия.
 
-Все четыре пресета работают через Anthropic-совместимый эндпоинт. Шлюз
+Все пять пресетов работают через Anthropic-совместимый эндпоинт. Шлюз
 нормализует имена моделей, аутентификацию и неподдерживаемые блоки, поэтому
 Claude Code всегда видит публичные имена `claude-*`.
 
@@ -16,13 +16,14 @@ Claude Code всегда видит публичные имена `claude-*`.
 | Tencent Hunyuan | `gateway/providers/tencent.json` | `https://api.hunyuan.cloud.tencent.com/anthropic` | `x-api-key` + `TENCENT_API_KEY` | `hunyuan-2.0-instruct-20251111` |
 | Alibaba Bailian | `gateway/providers/alibaba.json` | `https://dashscope.aliyuncs.com/apps/anthropic` | `Authorization: Bearer` + `DASHSCOPE_API_KEY` | `qwen3.7-plus` |
 | OpenRouter | `gateway/providers/openrouter.json` | `https://openrouter.ai/api` | `Authorization: Bearer` + `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4.5` |
+| Хомяк API | `gateway/providers/homyak.json` | `https://api.homyakstudio.ru` | `Authorization: Bearer` + `HOMYAK_API_KEY` | `homyak-flash` |
 
 ID моделей приведены как примеры и со временем меняются.
 
 > **Статус проверки.** DeepSeek проверен живыми запросами 2026-11-19. Пресеты
-> Tencent, Alibaba и OpenRouter собраны по официальной документации и в этом
-> репозитории живьём не проверялись. Сверьте ID моделей, эндпоинт и заголовок
-> аутентификации для своего аккаунта.
+> Tencent, Alibaba, OpenRouter и Хомяк API собраны по официальной документации
+> и в этом репозитории живьём не проверялись. Сверьте ID моделей, эндпоинт и
+> заголовок аутентификации для своего аккаунта.
 
 ## DeepSeek
 
@@ -183,6 +184,49 @@ OpenRouter использует для атрибуции. Замените URL 
 OpenRouter возвращает `usage.cost`. Шлюз сохраняет точное значение, а не
 оценивает по таблице; таблица используется только как запасной вариант.
 
+## Хомяк API (homyakstudio.ru)
+
+Российский сервис с Anthropic-совместимым эндпоинтом к DeepSeek. Подходит,
+если нет иностранной карты: кошелёк и списание — в рублях.
+
+- Регистрация, пополнение и создание ключа:
+  <https://homyakstudio.ru/?utm_source=github>.
+- Оплата: карта РФ, СБП, MirPay и SberPay, пополнение от 500 ₽; для ИП и ООО —
+  счёт от 1 000 ₽.
+- Anthropic base URL: `https://api.homyakstudio.ru` (Claude Code добавляет
+  `/v1/messages`).
+- Ключ `sk-hmk-…` отправляется как `Authorization: Bearer`.
+
+Модель одна — `homyak-flash` (DeepSeek V4.1 Flash): 1M контекста, 384K ответа,
+изображения, инструменты. Цены в рублях за 1M токенов:
+
+| Тариф | Вход | Кеш | Выход |
+|---|---|---|---|
+| Пик (будни 09:00–12:00 и 14:00–18:00 по Пекину) | 39,00 ₽ | 0,78 ₽ | 156,00 ₽ |
+| Не пик | 19,50 ₽ | 0,39 ₽ | 78,00 ₽ |
+
+Прямые настройки:
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.homyakstudio.ru",
+    "ANTHROPIC_AUTH_TOKEN": "sk-hmk-...",
+    "ANTHROPIC_API_KEY": "",
+    "ANTHROPIC_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "homyak-flash",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "homyak-flash"
+  }
+}
+```
+
+В пресете шлюза все три роли (`main`, `heavy`, `cheap`) указывают на
+`homyak-flash`, а `currency` — `RUB`: расход в `report.mjs` и дневной бюджет
+считаются в рублях по тарифу пик/непик. PDF не поддерживается — шлюз убирает
+блоки `document` и пишет причину в `notes`.
+
 ## Переключение провайдера
 
 Отредактируйте `gateway/config.json`:
@@ -254,20 +298,21 @@ ID провайдера должен соответствовать `[a-z0-9][a-
 - `examples/claude-settings/tencent.settings.json`
 - `examples/claude-settings/alibaba.settings.json`
 - `examples/claude-settings/openrouter.settings.json`
+- `examples/claude-settings/homyak.settings.json`
 
 Это шаблоны: замените `<YOUR_..._KEY>` и объедините блок `env` с существующим
 `~/.claude/settings.json`. Не перезаписывайте остальные настройки.
 
 ## Совместимость
 
-| Возможность | DeepSeek | Tencent | Alibaba | OpenRouter |
-|---|---|---|---|---|
-| Стриминг | да | да | да | да |
-| Инструменты | да | да | да | да |
-| Изображения | только flash; шлюз перенаправляет | зависит от модели | зависит от модели | зависит от модели |
-| PDF | Files API | не поддерживается | не поддерживается | нативно |
-| Веб-поиск на стороне провайдера | оплачивается и логируется | зависит от модели | зависит от модели | зависит от модели |
-| Точная стоимость из ответа | нет | нет | нет | да (`usage.cost`) |
+| Возможность | DeepSeek | Tencent | Alibaba | OpenRouter | Хомяк API |
+|---|---|---|---|---|---|
+| Стриминг | да | да | да | да | да |
+| Инструменты | да | да | да | да | да |
+| Изображения | только flash; шлюз перенаправляет | зависит от модели | зависит от модели | зависит от модели | да |
+| PDF | Files API | не поддерживается | не поддерживается | нативно | не поддерживается |
+| Веб-поиск на стороне провайдера | оплачивается и логируется | зависит от модели | зависит от модели | зависит от модели | нет |
+| Точная стоимость из ответа | нет | нет | нет | да (`usage.cost`) | нет |
 
 Возможности провайдеров меняются. Если запрос падает, смотрите
 `gateway/logs/requests.jsonl`, поле `notes` и заголовок `x-gateway-route`.

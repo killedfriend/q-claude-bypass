@@ -26,8 +26,9 @@ QClaude Code запускает настоящий Claude Code и Claude Desktop
 
 - **Настоящий Claude Code.** Никаких форков и модификаций клиента. Только
   переменные окружения и локальный HTTP-шлюз.
-- **Четыре готовых провайдера:** DeepSeek, Tencent Hunyuan, Alibaba Cloud
-  Bailian (Qwen), OpenRouter. Добавить свой можно одним JSON-файлом.
+- **Пять готовых провайдеров:** DeepSeek, Tencent Hunyuan, Alibaba Cloud
+  Bailian (Qwen), OpenRouter, Хомяк API (homyakstudio.ru). Добавить свой
+  можно одним JSON-файлом.
 - **Маршрутизация моделей.** `opus` → тяжёлая модель, `haiku` и фоновые вызовы
   без инструментов → дешёвая, остальное → основная.
 - **Учёт денег.** Токены, попадания в кэш, цена запроса, веб-поиск, дневной
@@ -56,7 +57,7 @@ QClaude Gateway (Node.js, без зависимостей)
   └─ пишет gateway/logs/requests.jsonl
         │
         ▼
-DeepSeek / Tencent / Alibaba / OpenRouter
+DeepSeek / Tencent / Alibaba / OpenRouter / Хомяк API
 ```
 
 Провайдер получает обычный запрос в формате Anthropic Messages API. Claude Code
@@ -70,6 +71,14 @@ DeepSeek / Tencent / Alibaba / OpenRouter
 | Tencent Hunyuan | `https://api.hunyuan.cloud.tencent.com/anthropic` | `TENCENT_API_KEY` | `hunyuan-2.0-instruct-20251111`, `hunyuan-2.0-thinking-20251109` |
 | Alibaba Bailian | `https://dashscope.aliyuncs.com/apps/anthropic` | `DASHSCOPE_API_KEY` | `qwen3.7-plus`, `qwen3.7-max`, `qwen3.6-flash` |
 | OpenRouter | `https://openrouter.ai/api` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4.5`, `anthropic/claude-opus-4.5`, `anthropic/claude-haiku-4.5` |
+| Хомяк API | `https://api.homyakstudio.ru` | `HOMYAK_API_KEY` | `homyak-flash` |
+
+> **Хомяк API — оплата без иностранной карты.** Российский реселлер DeepSeek с
+> Anthropic-совместимым эндпоинтом: пополнение в рублях картой РФ, СБП,
+> MirPay и SberPay, от 500 ₽ (для ИП и ООО — счёт от 1 000 ₽). Регистрация и
+> ключи: <https://homyakstudio.ru/?utm_source=github>. Модель одна —
+> `homyak-flash` (1M контекста, 384K ответа, изображения, инструменты), расход
+> шлюз считает в рублях по тарифу пик/непик.
 
 Точные идентификаторы моделей меняются. Проверяйте их в консоли провайдера;
 для OpenRouter — на странице моделей. Подробности и альтернативные тарифные
@@ -78,9 +87,9 @@ DeepSeek / Tencent / Alibaba / OpenRouter
 
 > **Статус проверки.** Путь DeepSeek проверен живыми запросами 2026-11-19
 > (запрос, стриминг, инструменты, PDF, учёт цены) на Claude Code 2.1.326 и
-> Claude Desktop 5.11492.5, Windows 11, Node 22.20. Пресеты Tencent, Alibaba и
-> OpenRouter собраны по официальной документации провайдеров и в этом
-> репозитории живьём не проверялись. Сверьте ID моделей и заголовок
+> Claude Desktop 5.11492.5, Windows 11, Node 22.20. Пресеты Tencent, Alibaba,
+> OpenRouter и Хомяк API собраны по официальной документации провайдеров и в
+> этом репозитории живьём не проверялись. Сверьте ID моделей и заголовок
 > аутентификации для своего аккаунта, прежде чем полагаться на них.
 
 ## Быстрый старт (Windows)
@@ -169,8 +178,8 @@ $env:GATEWAY_PROVIDER = 'alibaba'
 ```
 
 Ключ хранится в пользовательской переменной окружения
-(`DEEPSEEK_API_KEY`, `TENCENT_API_KEY`, `DASHSCOPE_API_KEY` или
-`OPENROUTER_API_KEY`). В репозитории ключей нет.
+(`DEEPSEEK_API_KEY`, `TENCENT_API_KEY`, `DASHSCOPE_API_KEY`,
+`OPENROUTER_API_KEY` или `HOMYAK_API_KEY`). В репозитории ключей нет.
 
 ## Файлы
 
@@ -197,8 +206,8 @@ $env:GATEWAY_PROVIDER = 'alibaba'
 
 - [Установка](docs/ru/installation.md) — установщик, ручная установка,
   обновление, удаление, автозапуск.
-- [Провайдеры](docs/ru/providers.md) — Tencent, Alibaba, OpenRouter, DeepSeek:
-  ключи, эндпоинты, модели, примеры настроек.
+- [Провайдеры](docs/ru/providers.md) — Tencent, Alibaba, OpenRouter, DeepSeek,
+  Хомяк API: ключи, эндпоинты, модели, примеры настроек.
 - [Конфигурация](docs/ru/configuration.md) — шлюз, маршрутизация, цены, логи,
   бюджеты, переменные окружения.
 - [Диагностика](docs/ru/troubleshooting.md) — ошибки 401/404/429, модели,

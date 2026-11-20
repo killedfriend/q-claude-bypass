@@ -369,11 +369,13 @@ function Select-Provider {
     Write-Host '  2. Tencent Hunyuan'
     Write-Host '  3. Alibaba Cloud Bailian (Qwen)'
     Write-Host '  4. OpenRouter'
+    Write-Host '  5. Homyak API (homyakstudio.ru, RUB)'
     $choice = Read-Host '  Choose provider [1]'
     switch ($choice) {
         '2' { return 'tencent' }
         '3' { return 'alibaba' }
         '4' { return 'openrouter' }
+        '5' { return 'homyak' }
         default { return 'deepseek' }
     }
 }
@@ -623,7 +625,7 @@ try {
 
     $providerId = Select-Provider
     if (-not $providerId) { $providerId = 'deepseek' }
-    if ($providerId -notin @('deepseek', 'tencent', 'alibaba', 'openrouter')) {
+    if ($providerId -notin @('deepseek', 'tencent', 'alibaba', 'openrouter', 'homyak')) {
         throw "unknown provider: $providerId"
     }
     $providerFile = Join-Path $source "gateway\providers\$providerId.json"

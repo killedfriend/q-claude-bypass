@@ -52,6 +52,7 @@ test('DeepSeek peak hours are Beijing business hours', () => {
 
 test('currency symbols', () => {
   assert.equal(currencySymbol('CNY'), '\u00a5');
+  assert.equal(currencySymbol('RUB'), '\u20bd');
   assert.equal(currencySymbol('USD'), '$');
   assert.equal(currencySymbol('EUR'), '\u20ac');
 });

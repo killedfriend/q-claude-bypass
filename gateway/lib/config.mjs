@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
-export const PROVIDER_IDS = ['deepseek', 'tencent', 'alibaba', 'openrouter'];
+export const PROVIDER_IDS = ['deepseek', 'tencent', 'alibaba', 'openrouter', 'homyak'];
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8').replace(/^\uFEFF/, ''));

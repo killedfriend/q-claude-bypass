@@ -21,8 +21,8 @@ Claude Desktop 使用第三方模型。客户端与模型服务之间有一个�
 ## 主要功能
 
 - **真正的 Claude Code。** 不修改客户端，只使用环境变量和本地 HTTP 网关。
-- **四个现成服务商：** DeepSeek、腾讯混元、阿里云百炼（Qwen）、OpenRouter。
-  新增服务商只需要一个 JSON 文件。
+- **五个现成服务商：** DeepSeek、腾讯混元、阿里云百炼（Qwen）、OpenRouter、
+  Homyak API（仅限俄罗斯）。新增服务商只需要一个 JSON 文件。
 - **模型路由。** `opus` → 重型模型，`haiku` 和无工具的后台调用 → 廉价模型，
   其余 → 主模型。
 - **费用统计。** Token、缓存命中、单次请求费用、联网搜索、可选的每日预算。
@@ -51,7 +51,7 @@ QClaude Gateway（Node.js，零依赖）
   └─ 写入 gateway/logs/requests.jsonl
         │
         ▼
-DeepSeek / 腾讯 / 阿里云 / OpenRouter
+DeepSeek / 腾讯 / 阿里云 / OpenRouter / Homyak API
 ```
 
 服务商收到的是标准 Anthropic Messages API 请求。Claude Code 并不知道自己
@@ -65,6 +65,14 @@ DeepSeek / 腾讯 / 阿里云 / OpenRouter
 | 腾讯混元 | `https://api.hunyuan.cloud.tencent.com/anthropic` | `TENCENT_API_KEY` | `hunyuan-2.0-instruct-20251111`、`hunyuan-2.0-thinking-20251109` |
 | 阿里云百炼 | `https://dashscope.aliyuncs.com/apps/anthropic` | `DASHSCOPE_API_KEY` | `qwen3.7-plus`、`qwen3.7-max`、`qwen3.6-flash` |
 | OpenRouter | `https://openrouter.ai/api` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4.5`、`anthropic/claude-opus-4.5`、`anthropic/claude-haiku-4.5` |
+| Homyak API（仅限俄罗斯） | `https://api.homyakstudio.ru` | `HOMYAK_API_KEY` | `homyak-flash` |
+
+> **Homyak API 仅面向俄罗斯用户。** 这是 DeepSeek 的俄罗斯转售服务，提供
+> Anthropic 兼容端点：余额和计费均以卢布结算，充值支持俄罗斯银行卡、SBP、
+> MirPay 和 SberPay（500 ₽ 起），无需境外银行卡。注册地址：
+> <https://homyakstudio.ru/?utm_source=github>。只有一个模型
+> `homyak-flash`（1M 上下文、384K 输出、图像、工具）；网关按峰谷价以卢布
+> 统计费用。
 
 模型 ID 会变化。请在服务商控制台或 OpenRouter 模型页面确认。腾讯 TokenHub、
 阿里云 Coding Plan 等计费端点和完整说明见
@@ -72,8 +80,8 @@ DeepSeek / 腾讯 / 阿里云 / OpenRouter
 
 > **验证状态。** DeepSeek 路径已在 2026-11-19 用真实请求验证（普通请求、
 > 流式、工具、PDF、费用记录），环境为 Claude Code 2.1.326、Claude Desktop
-> 5.11492.5、Windows 11、Node 22.20。腾讯、阿里云和 OpenRouter 预设基于
-> 服务商官方文档编写，未在本仓库中做真实请求验证。使用前请核对账户支持的
+> 5.11492.5、Windows 11、Node 22.20。腾讯、阿里云、OpenRouter 和 Homyak API
+> 预设基于服务商官方文档编写，未在本仓库中做真实请求验证。使用前请核对账户支持的
 > 模型 ID 和认证头。
 
 ## 快速开始（Windows）
@@ -160,7 +168,8 @@ $env:GATEWAY_PROVIDER = 'alibaba'
 ```
 
 密钥保存在用户环境变量中（`DEEPSEEK_API_KEY`、`TENCENT_API_KEY`、
-`DASHSCOPE_API_KEY` 或 `OPENROUTER_API_KEY`）。仓库中不包含任何密钥。
+`DASHSCOPE_API_KEY`、`OPENROUTER_API_KEY` 或 `HOMYAK_API_KEY`）。仓库中
+不包含任何密钥。
 
 ## 文件说明
 
@@ -186,8 +195,8 @@ $env:GATEWAY_PROVIDER = 'alibaba'
 ## 文档
 
 - [安装](docs/zh/installation.md) — 安装器、手动安装、升级、卸载、自启。
-- [服务商](docs/zh/providers.md) — 腾讯、阿里云、OpenRouter、DeepSeek：
-  密钥、端点、模型、配置示例。
+- [服务商](docs/zh/providers.md) — 腾讯、阿里云、OpenRouter、DeepSeek、
+  Homyak API：密钥、端点、模型、配置示例。
 - [配置](docs/zh/configuration.md) — 网关、路由、计价、日志、预算、环境变量。
 - [故障排查](docs/zh/troubleshooting.md) — 401/404/429、模型、Desktop、端口、
   Node.js、UAC。

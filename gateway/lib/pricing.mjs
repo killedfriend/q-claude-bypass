@@ -21,6 +21,7 @@ export function isPeak(now = new Date()) {
 
 export function currencySymbol(currency = 'USD') {
   if (currency === 'CNY' || currency === 'RMB') return '\u00a5';
+  if (currency === 'RUB') return '\u20bd';
   if (currency === 'EUR') return '\u20ac';
   return '$';
 }

@@ -1,0 +1,12 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.homyakstudio.ru",
+    "ANTHROPIC_AUTH_TOKEN": "sk-hmk-REPLACE_WITH_YOUR_HOMYAK_KEY",
+    "ANTHROPIC_API_KEY": "",
+    "ANTHROPIC_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "homyak-flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "homyak-flash",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "homyak-flash"
+  }
+}

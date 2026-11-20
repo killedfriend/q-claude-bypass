@@ -1,0 +1,51 @@
+{
+  "name": "Хомяк API (homyakstudio.ru)",
+  "docs": "https://homyakstudio.ru/?utm_source=github",
+  "upstream": "https://api.homyakstudio.ru",
+  "currency": "RUB",
+
+  "auth": {
+    "mode": "gateway",
+    "header": "authorization",
+    "scheme": "Bearer ",
+    "env": "HOMYAK_API_KEY"
+  },
+
+  "models": {
+    "main": "homyak-flash",
+    "heavy": "homyak-flash",
+    "cheap": "homyak-flash"
+  },
+
+  "vision": ["homyak-flash"],
+  "documents": "none",
+
+  "cheapProfile": {
+    "maxTokens": 4096
+  },
+
+  "pricing": {
+    "_comment": "RUB per 1M tokens, retail price of the service (DeepSeek list price x 130 RUB/USD). Peak = Mon-Fri 09:00-12:00 and 14:00-18:00 Beijing, same windows as DeepSeek.",
+    "homyak-flash": {
+      "peak": { "cacheRead": 0.78, "input": 39, "output": 156 },
+      "offPeak": { "cacheRead": 0.39, "input": 19.5, "output": 78 }
+    }
+  },
+
+  "client": {
+    "direct": {
+      "model": "homyak-flash",
+      "opus": "homyak-flash",
+      "sonnet": "homyak-flash",
+      "haiku": "homyak-flash",
+      "subagent": "homyak-flash"
+    },
+    "gateway": {
+      "model": "claude-sonnet-4-5[1m]",
+      "opus": "claude-opus-4-5",
+      "sonnet": "claude-sonnet-4-5[1m]",
+      "haiku": "claude-haiku-4-5",
+      "subagent": "claude-sonnet-4-5"
+    }
+  }
+}

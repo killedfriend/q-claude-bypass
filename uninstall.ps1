@@ -153,7 +153,7 @@ if (-not $KeepSettings) {
 
 # 5. API keys
 if ($RemoveApiKey) {
-    foreach ($name in @('DEEPSEEK_API_KEY', 'TENCENT_API_KEY', 'DASHSCOPE_API_KEY', 'OPENROUTER_API_KEY')) {
+    foreach ($name in @('DEEPSEEK_API_KEY', 'TENCENT_API_KEY', 'DASHSCOPE_API_KEY', 'OPENROUTER_API_KEY', 'HOMYAK_API_KEY')) {
         [Environment]::SetEnvironmentVariable($name, $null, 'User')
         Write-Host "removed user variable $name"
     }
