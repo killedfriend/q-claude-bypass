@@ -37,7 +37,7 @@ param(
 
     [string]$Repo = 'killedfriend/q-claude-bypass',
 
-    [string]$Version = '1.0.5',
+    [string]$Version = '1.0.6',
 
     [switch]$SkipNode,
     [switch]$SkipClaudeCode,

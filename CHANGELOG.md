@@ -3,6 +3,17 @@
 All notable changes are documented here. The project is educational and
 non-commercial; compatibility is best-effort.
 
+## 1.0.6 — 2026-11-20
+
+- Added the Homyak API provider (`homyakstudio.ru`): an Anthropic-compatible
+  DeepSeek endpoint for users in Russia, billed in RUB at peak/off-peak rates
+  and paid by Russian card, SBP, MirPay or SberPay.
+- The gateway spend report and daily budget show RUB with the ₽ symbol.
+- The installer offers Homyak API as provider 5 and accepts
+  `-Provider homyak`; the uninstaller removes `HOMYAK_API_KEY`.
+- Documented the provider in all three languages, including the Russia-only
+  note and payment methods.
+
 ## 1.0.5 — 2026-11-19
 
 - Fixed `irm ... | iex`: the unbound `ValidateSet` on `-Provider` made Windows
